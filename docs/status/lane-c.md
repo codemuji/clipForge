@@ -2,11 +2,12 @@
 
 ## Current
 Ticket: C-01 API skeleton (read-only)
-State: IN PROGRESS
+State: READY
 Branch: lane/c
-PR: none
+PR: #4
 Blocked by: none
-Notes: Building Fastify read-only API skeleton with SQLite queries and integration tests.
+Notes: C-01 implemented and tested. PR #4 opened, waiting for Integrator review.
 
 ## Done
 - S0-3 Product and data spike — DONE (PR #1)
+- C-01 API skeleton (read-only) — READY (PR #4)
