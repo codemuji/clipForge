@@ -85,7 +85,7 @@ The `<source-domain>` folder is derived from the stream URL host with `www.` str
 
 1. **Read before writing.** Check `docs/CONTRACTS.md` and existing code in your directory before creating anything.
 2. **Contracts are law.** Any change to a shape in `CONTRACTS.md` requires a ticket and a version bump in that file. Do not silently change types.
-3. **One ticket at a time, in your lane.** Claim a ticket by setting `Status: IN PROGRESS` and your agent ID in `docs/PLAN.md`. Do not start a ticket whose dependencies are not `DONE`.
+3. **One ticket at a time, in your lane.** Claim a ticket by setting `State: IN PROGRESS` and the ticket ID in your lane's status file (`docs/status/lane-<x>.md`). `docs/PLAN.md` is read-only for you. Do not start a ticket whose dependencies are not merged to `main`.
 4. **Tests ship with code.** No ticket is `DONE` without its listed tests passing.
 5. **No new dependencies without justification.** Each new package goes in the ticket with a one-line reason. Prefer ffmpeg, the standard library, and packages already listed here.
 6. **No paid or hosted APIs.** No OpenAI, Anthropic, Google Cloud, AWS, or similar at runtime. Local models only. Platform chat/metadata feeds that are free and documented are allowed behind an adapter.
@@ -151,14 +151,30 @@ The project moves through five phases. Do not start a phase until the gate for t
 
 ## 11. How to report
 
-At the end of each ticket, the agent appends to `docs/PLAN.md` under the ticket:
+At the end of each ticket, the agent does three things:
+
+1. Opens a PR from its lane branch to `main`, titled `<TICKET-ID> <title>`, with this body:
 
 ```
-Result: DONE | BLOCKED | PARTIAL
+Ticket: <ID>
 Changed: <paths>
-Verified: <commands run and their output summary>
+Verified: <commands run and output summary>
 Risks: <one line each>
-Cross-agent requests: <none or list>
+Cross-lane requests: <none or list>
 ```
 
-If BLOCKED, state the blocker and the ticket ID it depends on. Do not guess across lanes.
+2. Sets its status file to `State: READY` with the PR number.
+3. Waits for the Integrator. It does not merge its own PR.
+
+If BLOCKED, the agent sets `State: BLOCKED` with the blocker and the ticket ID it depends on, then moves to the next unblocked ticket in its lane. Do not guess across lanes.
+
+## 12. Git workflow and roles
+
+- `main` is protected. Changes arrive only as squash-merged PRs that pass CI and have the Integrator's approval.
+- `lane/a`, `lane/b`, `lane/c` are the lane agents' branches. Lane agents push only to their own branch.
+- The Integrator is the only agent that merges to `main`, edits the gate section of `docs/PLAN.md`, and edits `.github/`.
+- Before starting each ticket, run `git fetch && git merge origin/main` on your lane branch.
+- A PR touching `packages/shared/` or `docs/CONTRACTS.md` needs the `contract-change` label. The Integrator approves it only after the other lanes have commented in their status files.
+- A PR touching another lane's directory without a ticket is rejected.
+- Commit messages: `<TICKET-ID>: <imperative summary>`, for example `A-05: add eviction protection for queued clip jobs`.
+- Never force-push to `main`. Lane branches may be force-pushed only by their own agent, and only after a rebase on `origin/main`.
