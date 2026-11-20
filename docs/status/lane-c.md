@@ -2,10 +2,11 @@
 
 ## Current
 Ticket: S0-3 Product and data spike
-State: IN PROGRESS
+State: READY
 Branch: lane/c
-PR: none
+PR: #1
 Blocked by: none
-Notes: Drafting ADR-003 for API stack, dashboard stack, SQLite schema, and UI wireframes.
+Notes: ADR-003 published and PR #1 opened. Waiting for Integrator.
 
 ## Done
+- S0-3 Product and data spike — READY (PR #1)
