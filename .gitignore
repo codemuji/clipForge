@@ -1,0 +1,49 @@
+# Dependencies
+node_modules/
+.pnpm-store/
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# Build artifacts
+dist/
+build/
+*.tsbuildinfo
+
+# Storage layout (per AGENTS.md §4 & §10)
+storage/*
+!storage/.gitkeep
+!storage/README.md
+
+# Environment and secrets
+.env
+.env.*
+!.env.example
+
+# Models and weights (AGENTS.md §10)
+models/
+*.onnx
+*.bin
+*.pt
+*.pth
+*.gguf
+
+# Media files outside fixtures (AGENTS.md §10)
+*.mp4
+*.mkv
+*.avi
+*.mov
+*.wav
+*.flac
+!fixtures/**
+
+# Logs
+*.log
+logs/
+
+# IDE / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

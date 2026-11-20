@@ -1,0 +1,6 @@
+{
+  "name": "@clipforge/api",
+  "version": "0.1.0",
+  "description": "Clipforge REST API service (Fastify)",
+  "private": true
+}

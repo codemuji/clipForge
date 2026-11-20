@@ -1,0 +1,38 @@
+# sources allow-list; orchestrator refuses anything not listed
+sources:
+  - url: "https://www.twitch.tv/example_channel"
+    label: "example-channel"
+    enabled: true
+
+buffer:
+  minutes: 10
+  segment_seconds: 2
+
+sampling:
+  interval_seconds: 1.5
+  audio_window_seconds: 5
+
+scoring:
+  threshold: 0.72
+  cooldown_seconds: 45
+  debounce_windows: 2
+  weights:
+    audio: 0.35
+    chat: 0.25
+    speech_keywords: 0.15
+    hud_text: 0.15
+    frame_classifier: 0.10
+
+clip:
+  pre_seconds: 10
+  post_seconds: 8
+  encode: "copy"
+  vertical: false
+
+detector:
+  url: "http://127.0.0.1:8731"
+  timeout_ms: 2500
+
+storage:
+  root: "./storage"
+  retention_days: 30

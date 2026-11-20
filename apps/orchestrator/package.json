@@ -1,0 +1,15 @@
+{
+  "name": "@clipforge/orchestrator",
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Clipforge pipeline orchestrator",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "test": "node --test dist/**/*.test.js"
+  },
+  "dependencies": {
+    "@clipforge/shared": "*"
+  }
+}
