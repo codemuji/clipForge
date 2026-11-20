@@ -43,7 +43,7 @@ if (mode === '--gpu') {
 } else {
   // Unit or all tests
   console.log('[TEST:UNIT] Running unit tests...');
-  run('node --test packages/shared/dist/test/logger.test.js apps/orchestrator/dist/test/smoke.test.js');
+  run('node --test packages/shared/dist/test/*.test.js apps/orchestrator/dist/test/*.test.js');
 }
 
 console.log('[TEST] Tests completed successfully.');

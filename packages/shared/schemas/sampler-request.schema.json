@@ -1,0 +1,35 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "clipforge.sampler-request.v1",
+  "title": "SamplerRequest",
+  "type": "object",
+  "required": [
+    "session_id",
+    "window_id",
+    "t_stream",
+    "t_wall",
+    "frame_path",
+    "audio_path",
+    "audio_sample_rate",
+    "chat"
+  ],
+  "properties": {
+    "session_id": { "type": "string" },
+    "window_id": { "type": "string" },
+    "t_stream": { "type": "number", "minimum": 0 },
+    "t_wall": { "type": "string", "format": "date-time" },
+    "frame_path": { "type": "string" },
+    "audio_path": { "type": "string" },
+    "audio_sample_rate": { "type": "integer", "default": 16000 },
+    "chat": {
+      "type": "object",
+      "required": ["messages_in_window", "unique_chatters"],
+      "properties": {
+        "messages_in_window": { "type": "integer", "minimum": 0 },
+        "unique_chatters": { "type": "integer", "minimum": 0 }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}
