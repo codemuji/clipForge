@@ -1,0 +1,6 @@
+{
+  "name": "@clipforge/dashboard",
+  "version": "0.1.0",
+  "description": "Clipforge React + Vite Dashboard",
+  "private": true
+}

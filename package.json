@@ -1,0 +1,27 @@
+{
+  "name": "clipforge-monorepo",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Local, autonomous highlight-clipping tool",
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
+  "scripts": {
+    "setup": "node scripts/check-env.js && npm install",
+    "build": "npm run build --workspaces --if-present",
+    "lint": "node scripts/lint.js",
+    "test": "node scripts/test.js --all",
+    "test:unit": "node scripts/test.js --unit",
+    "test:fixtures": "node scripts/test.js --fixtures",
+    "test:gpu": "node scripts/test.js --gpu",
+    "dev": "node scripts/dev.js",
+    "clean": "node scripts/clean.js",
+    "eval:detector": "node scripts/eval-detector.js"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.0",
+    "typescript": "^5.4.5"
+  }
+}
