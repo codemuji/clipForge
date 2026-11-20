@@ -1,12 +1,13 @@
 # Lane C status
 
 ## Current
-Ticket: S0-3 Product and data spike
+Ticket: C-01 API skeleton (read-only)
 State: READY
 Branch: lane/c
-PR: #1
+PR: #4
 Blocked by: none
-Notes: ADR-003 published and PR #1 opened. Waiting for Integrator.
+Notes: C-01 implemented and tested. PR #4 opened, waiting for Integrator review.
 
 ## Done
-- S0-3 Product and data spike — READY (PR #1)
+- S0-3 Product and data spike — DONE (PR #1)
+- C-01 API skeleton (read-only) — READY (PR #4)

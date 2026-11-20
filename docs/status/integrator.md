@@ -16,3 +16,4 @@ Notes: Watching for PRs marked READY from lanes A, B, and C
 - S0-3 Product and data spike — MERGED (PR #1, commit 254053e)
 - A-01 Repo scaffold, Makefile, lint — MERGED (PR #2, commit 4545e14)
 - S0-4 Contracts and fixtures, S0-1 Ingest spike — MERGED (PR #3, commit 1ebc2ad)
+- C-01 API skeleton (read-only) — MERGED (PR #4, commit 50754aa)
