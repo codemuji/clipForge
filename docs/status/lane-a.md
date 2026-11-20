@@ -1,11 +1,11 @@
 # Lane A status
 
 ## Current
-Ticket: none
-State: IDLE
+Ticket: A-01 Repo scaffold, Makefile, lint
+State: READY
 Branch: lane/a
-PR: none
+PR: #2
 Blocked by: none
-Notes: waiting for I-00
+Notes: PR #2 opened, waiting for Integrator review
 
 ## Done
