@@ -1,12 +1,12 @@
 # Lane C status
 
 ## Current
-Ticket: S0-3 Product and data spike
-State: READY
+Ticket: C-01 API skeleton (read-only)
+State: IN PROGRESS
 Branch: lane/c
-PR: #1
+PR: none
 Blocked by: none
-Notes: ADR-003 published and PR #1 opened. Waiting for Integrator.
+Notes: Building Fastify read-only API skeleton with SQLite queries and integration tests.
 
 ## Done
-- S0-3 Product and data spike — READY (PR #1)
+- S0-3 Product and data spike — DONE (PR #1)
