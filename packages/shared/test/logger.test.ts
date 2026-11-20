@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { Logger, createLogger } from '../dist/logger.js';
+import { Logger, createLogger } from '../src/logger.js';
 
 test('logger emits structured JSON log entries complying with CONTRACTS §8', () => {
   const logger = createLogger('test-component', 'sess-123');

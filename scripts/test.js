@@ -29,22 +29,21 @@ if (mode === '--gpu') {
   try {
     execSync('nvidia-smi', { stdio: 'ignore' });
     console.log('[TEST:GPU] Running GPU tests on detected CUDA hardware...');
-    run('node --test packages/**/test/*.gpu.test.ts apps/**/test/*.gpu.test.ts || true');
+    run('node --test packages/**/dist/test/*.gpu.test.js apps/**/dist/test/*.gpu.test.js || true');
   } catch {
     console.log('[TEST:GPU] No NVIDIA GPU detected. Skipping GPU-specific tests.');
   }
 } else if (mode === '--fixtures') {
   console.log('[TEST:FIXTURES] Running fixture integration tests...');
-  // Runs any fixture tests if present
   try {
-    run('node --test packages/**/test/*.fixtures.test.ts apps/**/test/*.fixtures.test.ts');
+    run('node --test packages/**/dist/test/*.fixtures.test.js apps/**/dist/test/*.fixtures.test.js');
   } catch {
     console.log('[TEST:FIXTURES] No fixture test files found yet. Passing.');
   }
 } else {
   // Unit or all tests
   console.log('[TEST:UNIT] Running unit tests...');
-  run('node --test packages/shared/test/logger.test.ts apps/orchestrator/test/smoke.test.ts');
+  run('node --test packages/shared/dist/test/logger.test.js apps/orchestrator/dist/test/smoke.test.js');
 }
 
 console.log('[TEST] Tests completed successfully.');

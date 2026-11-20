@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { PIPELINE_VERSION, createOrchestrator } from '../dist/index.js';
+import { PIPELINE_VERSION, createOrchestrator } from '../src/index.js';
 
 test('orchestrator smoke test: initializes with valid version and status', () => {
   const orchestrator = createOrchestrator('test-session');

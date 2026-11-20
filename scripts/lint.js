@@ -15,8 +15,10 @@ if (!fs.existsSync(path.join(__dirname, '..', 'node_modules'))) {
   run('npm install');
 }
 
+console.log('[LINT] Building shared declarations...');
+run('npx tsc -p packages/shared/tsconfig.json');
+
 console.log('[LINT] Running typecheck...');
-run('npx tsc -p packages/shared/tsconfig.json --noEmit');
 run('npx tsc -p apps/orchestrator/tsconfig.json --noEmit');
 
 console.log('[LINT] All lint and type checks passed.');
