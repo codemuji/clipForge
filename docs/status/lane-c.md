@@ -1,11 +1,12 @@
 # Lane C status
 
 ## Current
-Ticket: none
-State: IDLE
+Ticket: S0-3 Product and data spike
+State: READY
 Branch: lane/c
-PR: none
+PR: #1
 Blocked by: none
-Notes: waiting for I-00
+Notes: ADR-003 published and PR #1 opened. Waiting for Integrator.
 
 ## Done
+- S0-3 Product and data spike — READY (PR #1)
