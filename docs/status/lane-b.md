@@ -1,11 +1,11 @@
 # Lane B status
 
 ## Current
-Ticket: none
-State: IDLE
+Ticket: S0-2
+State: IN PROGRESS
 Branch: lane/b
 PR: none
 Blocked by: none
-Notes: waiting for I-00
+Notes: running detector model spike (whisper.cpp, OCR, MobileNetV3)
 
 ## Done
