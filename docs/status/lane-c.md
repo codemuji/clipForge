@@ -1,11 +1,11 @@
 # Lane C status
 
 ## Current
-Ticket: none
-State: IDLE
+Ticket: S0-3 Product and data spike
+State: IN PROGRESS
 Branch: lane/c
 PR: none
 Blocked by: none
-Notes: waiting for I-00
+Notes: Drafting ADR-003 for API stack, dashboard stack, SQLite schema, and UI wireframes.
 
 ## Done
