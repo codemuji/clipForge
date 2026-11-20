@@ -1,11 +1,12 @@
 # Lane A status
 
 ## Current
-Ticket: A-01 Repo scaffold, Makefile, lint
+Ticket: S0-4 Contracts and fixtures, S0-1 Ingest spike
 State: READY
 Branch: lane/a
-PR: #2
+PR: #3
 Blocked by: none
-Notes: PR #2 opened, waiting for Integrator review
+Notes: PR #3 opened (schemas, fixtures, and ADR-001). Waiting for Integrator review.
 
 ## Done
+- A-01 Repo scaffold, Makefile, lint — MERGED (#2)

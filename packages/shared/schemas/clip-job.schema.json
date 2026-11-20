@@ -1,0 +1,32 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "clipforge.clip-job.v1",
+  "title": "ClipJob",
+  "type": "object",
+  "required": [
+    "id",
+    "detection_id",
+    "start_t",
+    "end_t",
+    "status",
+    "output_path",
+    "error",
+    "created_at",
+    "updated_at"
+  ],
+  "properties": {
+    "id": { "type": "string" },
+    "detection_id": { "type": "string" },
+    "start_t": { "type": "number", "minimum": 0 },
+    "end_t": { "type": "number", "minimum": 0 },
+    "status": {
+      "type": "string",
+      "enum": ["queued", "cutting", "encoded", "failed", "reviewed"]
+    },
+    "output_path": { "type": "string" },
+    "error": { "type": ["string", "null"] },
+    "created_at": { "type": "string", "format": "date-time" },
+    "updated_at": { "type": "string", "format": "date-time" }
+  },
+  "additionalProperties": false
+}

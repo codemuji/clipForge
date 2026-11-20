@@ -1,0 +1,88 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "clipforge.detector-response.v1",
+  "title": "DetectorResponse",
+  "type": "object",
+  "required": [
+    "window_id",
+    "t_stream",
+    "signals",
+    "latency_ms",
+    "model_versions"
+  ],
+  "properties": {
+    "window_id": { "type": "string" },
+    "t_stream": { "type": "number", "minimum": 0 },
+    "signals": {
+      "type": "object",
+      "required": ["audio", "speech_keywords", "hud_text", "frame_classifier"],
+      "properties": {
+        "audio": {
+          "type": "object",
+          "required": ["value"],
+          "properties": {
+            "value": { "type": ["number", "null"], "minimum": 0, "maximum": 1 },
+            "detail": {
+              "type": "object",
+              "properties": {
+                "lufs": { "type": "number" },
+                "lufs_delta": { "type": "number" }
+              }
+            }
+          }
+        },
+        "speech_keywords": {
+          "type": "object",
+          "required": ["value"],
+          "properties": {
+            "value": { "type": ["number", "null"], "minimum": 0, "maximum": 1 },
+            "detail": {
+              "type": "object",
+              "properties": {
+                "matched": {
+                  "type": "array",
+                  "items": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "hud_text": {
+          "type": "object",
+          "required": ["value"],
+          "properties": {
+            "value": { "type": ["number", "null"], "minimum": 0, "maximum": 1 },
+            "detail": {
+              "type": "object",
+              "properties": {
+                "matched": {
+                  "type": "array",
+                  "items": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "frame_classifier": {
+          "type": "object",
+          "required": ["value"],
+          "properties": {
+            "value": { "type": ["number", "null"], "minimum": 0, "maximum": 1 },
+            "label": { "type": ["string", "null"] }
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "latency_ms": { "type": "number", "minimum": 0 },
+    "model_versions": {
+      "type": "object",
+      "properties": {
+        "whisper": { "type": "string" },
+        "ocr": { "type": "string" },
+        "frame": { "type": "string" }
+      }
+    }
+  },
+  "additionalProperties": false
+}
