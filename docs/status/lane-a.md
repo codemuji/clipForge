@@ -2,10 +2,10 @@
 
 ## Current
 Ticket: A-01 Repo scaffold, Makefile, lint
-State: IN PROGRESS
+State: READY
 Branch: lane/a
-PR: none
+PR: #2
 Blocked by: none
-Notes: Working on monorepo scaffold, root Makefile, package scripts, and linting configuration
+Notes: PR #2 opened, waiting for Integrator review
 
 ## Done
