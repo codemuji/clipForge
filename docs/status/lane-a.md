@@ -2,11 +2,11 @@
 
 ## Current
 Ticket: A-02 Config loader and validation
-State: IN PROGRESS
+State: READY
 Branch: lane/a
-PR: none
+PR: #5
 Blocked by: none
-Notes: Building YAML config loader, Zod schema validation, sources allow-list enforcement, and unit tests
+Notes: PR #5 opened (Zod config loader, sources allow-list enforcement, unit tests). Waiting for Integrator review.
 
 ## Done
 - A-01 Repo scaffold, Makefile, lint — MERGED (#2)
