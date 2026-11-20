@@ -1,0 +1,114 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "clipforge.config.v1",
+  "title": "ClipforgeConfig",
+  "type": "object",
+  "required": [
+    "sources",
+    "buffer",
+    "sampling",
+    "scoring",
+    "clip",
+    "detector",
+    "storage"
+  ],
+  "properties": {
+    "sources": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["url", "label", "enabled"],
+        "properties": {
+          "url": { "type": "string", "format": "uri" },
+          "label": { "type": "string", "minLength": 1 },
+          "enabled": { "type": "boolean" }
+        },
+        "additionalProperties": false
+      }
+    },
+    "buffer": {
+      "type": "object",
+      "required": ["minutes", "segment_seconds"],
+      "properties": {
+        "minutes": { "type": "integer", "minimum": 1 },
+        "segment_seconds": { "type": "number", "exclusiveMinimum": 0 }
+      },
+      "additionalProperties": false
+    },
+    "sampling": {
+      "type": "object",
+      "required": ["interval_seconds", "audio_window_seconds"],
+      "properties": {
+        "interval_seconds": { "type": "number", "exclusiveMinimum": 0 },
+        "audio_window_seconds": { "type": "number", "exclusiveMinimum": 0 }
+      },
+      "additionalProperties": false
+    },
+    "scoring": {
+      "type": "object",
+      "required": [
+        "threshold",
+        "cooldown_seconds",
+        "debounce_windows",
+        "weights"
+      ],
+      "properties": {
+        "threshold": { "type": "number", "minimum": 0, "maximum": 1 },
+        "cooldown_seconds": { "type": "number", "minimum": 0 },
+        "debounce_windows": { "type": "integer", "minimum": 1 },
+        "weights": {
+          "type": "object",
+          "required": [
+            "audio",
+            "chat",
+            "speech_keywords",
+            "hud_text",
+            "frame_classifier"
+          ],
+          "properties": {
+            "audio": { "type": "number", "minimum": 0, "maximum": 1 },
+            "chat": { "type": "number", "minimum": 0, "maximum": 1 },
+            "speech_keywords": { "type": "number", "minimum": 0, "maximum": 1 },
+            "hud_text": { "type": "number", "minimum": 0, "maximum": 1 },
+            "frame_classifier": { "type": "number", "minimum": 0, "maximum": 1 }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "clip": {
+      "type": "object",
+      "required": ["pre_seconds", "post_seconds", "encode", "vertical"],
+      "properties": {
+        "pre_seconds": { "type": "number", "minimum": 0 },
+        "post_seconds": { "type": "number", "minimum": 0 },
+        "encode": {
+          "type": "string",
+          "enum": ["copy", "h264_nvenc", "h264_cpu"]
+        },
+        "vertical": { "type": "boolean" }
+      },
+      "additionalProperties": false
+    },
+    "detector": {
+      "type": "object",
+      "required": ["url", "timeout_ms"],
+      "properties": {
+        "url": { "type": "string", "format": "uri" },
+        "timeout_ms": { "type": "integer", "minimum": 100 }
+      },
+      "additionalProperties": false
+    },
+    "storage": {
+      "type": "object",
+      "required": ["root", "retention_days"],
+      "properties": {
+        "root": { "type": "string" },
+        "retention_days": { "type": "integer", "minimum": 1 }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}
