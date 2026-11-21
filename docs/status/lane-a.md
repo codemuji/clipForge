@@ -1,12 +1,12 @@
 # Lane A status
 
 ## Current
-Ticket: A-04 Ingest with reconnect
-State: IN PROGRESS
+Ticket: A-05 Rolling buffer and eviction
+State: READY
 Branch: lane/a
-PR: none
+PR: #15
 Blocked by: none
-Notes: Starting A-04 Ingest with reconnect (stream ingest wrapper, exponential backoff reconnect, state transitions, HLS disconnect test).
+Notes: Implemented BufferManager with sliding retention window (bufferMinutes + marginSeconds), index parsing, SQLite clip job protection query integration (prevents unlinking queued/cutting segments), and disk usage metrics. Tested with 40/40 passing unit and integration tests.
 
 ## Done
 - A-01 Repo scaffold, Makefile, lint — MERGED (#2)
@@ -14,3 +14,4 @@ Notes: Starting A-04 Ingest with reconnect (stream ingest wrapper, exponential b
 - S0-1 Ingest and buffer spike — MERGED (#3)
 - A-02 Config loader and validation — MERGED (#5)
 - A-03 SQLite store and migrations — MERGED (#8)
+- A-04 Ingest with reconnect — MERGED (#14)
