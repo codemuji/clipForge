@@ -9,7 +9,7 @@ State: IDLE
 Branch: main
 PR: none
 Blocked by: none
-Notes: Phase 0 complete! Gate G0 passed. Phase 1 underway: A-05 merged (unblocks A-06 Sampler and A-09 Cutter). Watching for next PRs.
+Notes: Phase 0 complete! Gate G0 passed. Phase 1 underway: A-06 merged (unblocks A-07 Chat adapter and brings A-08 Scorer closer). Watching for next PRs.
 
 ## Done
 - I-00 Repository bootstrap and branch protection — DONE
@@ -29,3 +29,5 @@ Notes: Phase 0 complete! Gate G0 passed. Phase 1 underway: A-05 merged (unblocks
 - B-03 Speech keywords — MERGED (PR #13, commit f957c78)
 - A-04 Ingest with reconnect — MERGED (PR #14, commit 08b3267)
 - A-05 Rolling buffer and eviction — MERGED (PR #15, commit 7ada5f3)
+- B-04 HUD text detection — MERGED (PR #16, commit ee4c06d)
+- A-06 Sampler — MERGED (PR #17, commit 7ebbbde)
