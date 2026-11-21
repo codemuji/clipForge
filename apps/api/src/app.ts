@@ -1,6 +1,7 @@
 import Fastify, { type FastifyInstance, type FastifyError } from 'fastify';
 import { DatabaseService } from './db.js';
 import { checkHealth } from './health.js';
+import { buildStorageTree, revealInExplorer } from './storage.js';
 
 export interface AppOptions {
   db?: DatabaseService;
@@ -8,6 +9,8 @@ export interface AppOptions {
   detectorUrl?: string;
   storagePath?: string;
   logger?: boolean;
+  revealPlatform?: NodeJS.Platform;
+  revealExecutor?: (command: string, args: string[]) => void;
 }
 
 export function createApp(options: AppOptions = {}): FastifyInstance {
@@ -65,6 +68,26 @@ export function createApp(options: AppOptions = {}): FastifyInstance {
     });
   });
 
+  // POST /api/detections/:id/dismiss - marks detection dismissed
+  app.post<{
+    Params: {
+      id: string;
+    };
+  }>('/api/detections/:id/dismiss', async (request, reply) => {
+    const { id } = request.params;
+    const updated = db.dismissDetection(id);
+    if (!updated) {
+      return reply.status(404).send({
+        error: {
+          code: 'DETECTION_NOT_FOUND',
+          message: `Detection not found: ${id}`,
+          correlation_id: id
+        }
+      });
+    }
+    return updated;
+  });
+
   // GET /api/clips?status=&source= - list clips with sidecar data
   app.get<{
     Querystring: {
@@ -97,6 +120,95 @@ export function createApp(options: AppOptions = {}): FastifyInstance {
       });
     }
     return clip;
+  });
+
+  // PATCH /api/clips/:id/review - updates only review.* fields per CONTRACTS §6 & §7
+  app.patch<{
+    Params: {
+      id: string;
+    };
+    Body: {
+      status?: string;
+      title?: string | null;
+      tags?: string[];
+      notes?: string | null;
+    };
+  }>('/api/clips/:id/review', async (request, reply) => {
+    const { id } = request.params;
+    const body = request.body || {};
+
+    const validStatuses = ['unreviewed', 'approved', 'rejected', 'favorited'];
+    if (body.status && !validStatuses.includes(body.status)) {
+      return reply.status(400).send({
+        error: {
+          code: 'INVALID_STATUS',
+          message: `Status must be one of: ${validStatuses.join(', ')}`,
+          correlation_id: id
+        }
+      });
+    }
+
+    const updated = db.updateClipReview(id, body);
+    if (!updated) {
+      return reply.status(404).send({
+        error: {
+          code: 'CLIP_NOT_FOUND',
+          message: `Clip not found: ${id}`,
+          correlation_id: id
+        }
+      });
+    }
+
+    return updated;
+  });
+
+  // GET /api/storage/tree - returns file and folder tree of storage
+  app.get<{
+    Querystring: {
+      subpath?: string;
+    };
+  }>('/api/storage/tree', async (request, reply) => {
+    try {
+      const subpath = request.query.subpath || '';
+      return buildStorageTree(storagePath, subpath);
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : String(err);
+      return reply.status(400).send({
+        error: {
+          code: 'STORAGE_ERROR',
+          message,
+          correlation_id: (request.headers['x-correlation-id'] as string) || request.id || 'storage'
+        }
+      });
+    }
+  });
+
+  // POST /api/storage/reveal - reveals a file or folder in OS native file explorer
+  app.post<{
+    Body: {
+      path?: string;
+    };
+  }>('/api/storage/reveal', async (request, reply) => {
+    try {
+      const targetPath = request.body?.path || '';
+      const result = revealInExplorer(storagePath, targetPath, {
+        platform: options.revealPlatform,
+        spawnFn: options.revealExecutor
+      });
+      return result;
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : String(err);
+      const isNotFound = message.includes('does not exist');
+      const statusCode = isNotFound ? 404 : 400;
+      const errorCode = isNotFound ? 'TARGET_NOT_FOUND' : 'STORAGE_REVEAL_ERROR';
+      return reply.status(statusCode).send({
+        error: {
+          code: errorCode,
+          message,
+          correlation_id: (request.headers['x-correlation-id'] as string) || request.id || 'storage'
+        }
+      });
+    }
   });
 
   // GET /api/health - returns {status, detector, buffer_free_gb, gpu}

@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import type { ViewMode, Session, Detection, ClipSidecar, HealthResponse } from './types.js';
-import { fetchHealth, fetchSessions, fetchDetections, fetchClips } from './api.js';
+import type { ViewMode, Session, Detection, ClipSidecar, HealthResponse, StorageTreeResponse } from './types.js';
+import { fetchHealth, fetchSessions, fetchDetections, fetchClips, dismissDetection, updateClipReview, fetchStorageTree, revealStoragePath } from './api.js';
 import { Header } from './components/Header.js';
 import { LiveDetectionsList } from './components/LiveDetectionsList.js';
 import { ClipGrid } from './components/ClipGrid.js';
 import { ClipDetail } from './components/ClipDetail.js';
+import { StorageBrowser } from './components/StorageBrowser.js';
 
 export const App: React.FC = () => {
   const [activeView, setActiveView] = useState<ViewMode>('live');
@@ -15,6 +16,8 @@ export const App: React.FC = () => {
   const [activeSessionId, setActiveSessionId] = useState<string>('');
   const [detections, setDetections] = useState<Detection[]>([]);
   const [clips, setClips] = useState<ClipSidecar[]>([]);
+  const [storageTree, setStorageTree] = useState<StorageTreeResponse | null>(null);
+  const [isStorageLoading, setIsStorageLoading] = useState<boolean>(false);
 
   const [minScore, setMinScore] = useState<number>(0);
   const [statusFilter, setStatusFilter] = useState<string>('all');
@@ -51,10 +54,8 @@ export const App: React.FC = () => {
 
   useEffect(() => {
     if (!isPolling) return;
-    // Initial fetch
     pollLiveData();
 
-    // 2000 ms polling interval
     const interval = setInterval(() => {
       pollLiveData();
     }, 2000);
@@ -67,6 +68,50 @@ export const App: React.FC = () => {
     setActiveView('clip-detail');
   };
 
+  const handleDismissDetection = async (id: string) => {
+    try {
+      const updated = await dismissDetection(id);
+      setDetections((prev) =>
+        prev.map((d) => (d.id === id ? { ...d, status: updated.status } : d))
+      );
+    } catch {
+      // Handle error
+    }
+  };
+
+  const handleSaveReview = async (reviewData: {
+    status: string;
+    title: string;
+    tags: string[];
+    notes: string;
+  }) => {
+    if (!activeClipId) return;
+    try {
+      const updated = await updateClipReview(activeClipId, reviewData);
+      setClips((prev) =>
+        prev.map((c) => (c.clip_id === updated.clip_id ? updated : c))
+      );
+    } catch {
+      // Handle error
+    }
+  };
+
+  const loadStorageTree = useCallback(async () => {
+    setIsStorageLoading(true);
+    try {
+      const data = await fetchStorageTree();
+      setStorageTree(data);
+    } catch {
+      // Degraded or offline
+    } finally {
+      setIsStorageLoading(false);
+    }
+  }, []);
+
+  const handleRevealStorage = async (relPath: string) => {
+    return revealStoragePath(relPath);
+  };
+
   const activeClip = clips.find((c) => c.clip_id === activeClipId) || clips[0];
 
   return (
@@ -76,6 +121,7 @@ export const App: React.FC = () => {
         onSelectView={(v) => {
           setActiveView(v);
           if (v === 'clips') fetchClips().then(setClips).catch(() => {});
+          if (v === 'storage') loadStorageTree();
         }}
         health={health}
         clipCount={clips.length}
@@ -92,6 +138,7 @@ export const App: React.FC = () => {
             onChangeMinScore={setMinScore}
             isPolling={isPolling}
             onSelectClip={handleSelectClip}
+            onDismiss={handleDismissDetection}
           />
         )}
 
@@ -110,15 +157,22 @@ export const App: React.FC = () => {
           <ClipDetail
             clip={activeClip}
             onBack={() => setActiveView('clips')}
-            onSaveReview={(data) => {
-              alert(`Review saved: ${data.status} - ${data.title}`);
-            }}
+            onSaveReview={handleSaveReview}
             onTrim={(offsets) => {
               alert(`Recutting clip with start: ${offsets.startOffset}s, end: ${offsets.endOffset}s`);
             }}
             onExport={(opts) => {
               alert(`Exporting clip (vertical: ${opts.vertical}, captions: ${opts.burnCaptions})`);
             }}
+          />
+        )}
+
+        {activeView === 'storage' && (
+          <StorageBrowser
+            treeData={storageTree}
+            isLoading={isStorageLoading}
+            onRefresh={loadStorageTree}
+            onReveal={handleRevealStorage}
           />
         )}
       </main>

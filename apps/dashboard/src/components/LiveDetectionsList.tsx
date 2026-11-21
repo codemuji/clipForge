@@ -10,6 +10,7 @@ export interface LiveDetectionsListProps {
   onChangeMinScore: (score: number) => void;
   isPolling?: boolean;
   onSelectClip?: (clipId: string) => void;
+  onDismiss?: (detectionId: string) => void;
 }
 
 export const LiveDetectionsList: React.FC<LiveDetectionsListProps> = ({
@@ -20,7 +21,8 @@ export const LiveDetectionsList: React.FC<LiveDetectionsListProps> = ({
   minScore,
   onChangeMinScore,
   isPolling = true,
-  onSelectClip
+  onSelectClip,
+  onDismiss
 }) => {
   const activeSession = sessions.find((s) => s.id === activeSessionId) || sessions[0];
 
@@ -140,12 +142,23 @@ export const LiveDetectionsList: React.FC<LiveDetectionsListProps> = ({
                     <span className="detection-timestamp">
                       t={detection.t_stream.toFixed(1)}s ({detection.t_wall || 'Live Window'})
                     </span>
-                    <span className={`badge badge-${detection.status}`}>
+                    <span className={`badge badge-${detection.status}`} data-testid={`detection-status-${detection.id}`}>
                       {detection.status}
                     </span>
                   </div>
 
                   <div style={{ display: 'flex', gap: '0.5rem' }}>
+                    {detection.status !== 'dismissed' && onDismiss && (
+                      <button
+                        className="btn btn-secondary"
+                        style={{ padding: '0.2rem 0.6rem', fontSize: '0.75rem' }}
+                        onClick={() => onDismiss(detection.id)}
+                        data-testid={`dismiss-btn-${detection.id}`}
+                      >
+                        Dismiss
+                      </button>
+                    )}
+
                     {detection.status === 'clipped' && onSelectClip && (
                       <button
                         className="btn btn-primary"

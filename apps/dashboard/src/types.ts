@@ -1,4 +1,27 @@
-export type ViewMode = 'live' | 'clips' | 'clip-detail';
+export type ViewMode = 'live' | 'clips' | 'clip-detail' | 'storage';
+
+export interface StorageNode {
+  name: string;
+  path: string;
+  type: 'file' | 'directory';
+  size_bytes: number;
+  modified_at?: string;
+  extension?: string;
+  children?: StorageNode[];
+}
+
+export interface StorageTreeStats {
+  total_files: number;
+  total_directories: number;
+  total_bytes: number;
+}
+
+export interface StorageTreeResponse {
+  root: string;
+  subpath: string;
+  tree: StorageNode;
+  stats: StorageTreeStats;
+}
 
 export interface Session {
   id: string;

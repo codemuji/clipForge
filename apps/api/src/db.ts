@@ -1,5 +1,7 @@
+import fs from 'node:fs';
+import path from 'node:path';
 import { DatabaseSync } from 'node:sqlite';
-import type { Session, Detection, ClipSidecar } from './types.js';
+import type { Session, Detection, ClipJob, ClipSidecar } from './types.js';
 
 export interface DatabaseServiceOptions {
   dbPath?: string;
@@ -125,18 +127,77 @@ export class DatabaseService {
     const stmt = this.db.prepare(query);
     const rows = stmt.all(...params) as Array<Record<string, unknown>>;
 
-    return rows.map((r) => ({
-      id: r.id as string,
-      session_id: r.session_id as string,
-      source_label: r.source_label as string,
-      source_domain: r.source_domain as string,
-      t_stream: r.t_stream as number,
-      t_wall: r.t_wall as string,
-      fused_score: r.fused_score as number,
-      signals: typeof r.signals === 'string' ? JSON.parse(r.signals) : (r.signals as Record<string, unknown>),
-      status: r.status as Detection['status'],
-      created_at: r.created_at as string | undefined
-    }));
+    return rows.map((r) => this.mapRowToDetection(r));
+  }
+
+  public getDetectionById(id: string): Detection | null {
+    const stmt = this.db.prepare('SELECT * FROM detections WHERE id = ?');
+    const row = stmt.get(id) as Record<string, unknown> | undefined;
+    if (!row) return null;
+    return this.mapRowToDetection(row);
+  }
+
+  public dismissDetection(id: string): Detection | null {
+    const detection = this.getDetectionById(id);
+    if (!detection) return null;
+
+    this.db.prepare("UPDATE detections SET status = 'dismissed' WHERE id = ?").run(id);
+    return this.getDetectionById(id);
+  }
+
+  public canCreateClipJob(detectionId: string): boolean {
+    const detection = this.getDetectionById(detectionId);
+    if (!detection) return false;
+    return detection.status !== 'dismissed';
+  }
+
+  public createClipJobFromDetection(
+    detectionId: string,
+    startT: number,
+    endT: number,
+    outputPath: string
+  ): ClipJob {
+    const detection = this.getDetectionById(detectionId);
+    if (!detection) {
+      throw new Error(`Detection not found: ${detectionId}`);
+    }
+
+    if (detection.status === 'dismissed') {
+      throw new Error(`Cannot create clip job for dismissed detection: ${detectionId}`);
+    }
+
+    const jobId = `job_${detectionId}`;
+    const now = new Date().toISOString();
+
+    this.db.prepare(`
+      INSERT INTO clip_jobs (
+        id, detection_id, session_id, start_t, end_t, status, output_path, error, created_at, updated_at
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `).run(
+      jobId,
+      detectionId,
+      detection.session_id,
+      startT,
+      endT,
+      'queued',
+      outputPath,
+      null,
+      now,
+      now
+    );
+
+    return {
+      id: jobId,
+      detection_id: detectionId,
+      session_id: detection.session_id,
+      start_t: startT,
+      end_t: endT,
+      status: 'queued',
+      output_path: outputPath,
+      error: null,
+      created_at: now,
+      updated_at: now
+    };
   }
 
   public getClips(options: { status?: string; source?: string } = {}): ClipSidecar[] {
@@ -168,6 +229,68 @@ export class DatabaseService {
     return this.mapRowToClipSidecar(row);
   }
 
+  public updateClipReview(
+    id: string,
+    review: {
+      status?: string;
+      title?: string | null;
+      tags?: string[];
+      notes?: string | null;
+    }
+  ): ClipSidecar | null {
+    const existing = this.getClipById(id);
+    if (!existing) return null;
+
+    const newStatus = review.status !== undefined ? review.status : existing.review.status;
+    const newTitle = review.title !== undefined ? review.title : existing.review.title;
+    const newTags = review.tags !== undefined ? review.tags : existing.review.tags;
+    const newNotes = review.notes !== undefined ? review.notes : existing.review.notes;
+    const now = new Date().toISOString();
+
+    const stmt = this.db.prepare(`
+      UPDATE clips
+      SET review_status = ?,
+          title = ?,
+          tags = ?,
+          notes = ?,
+          updated_at = ?
+      WHERE id = ?
+    `);
+
+    stmt.run(newStatus, newTitle, JSON.stringify(newTags), newNotes, now, id);
+
+    const updated = this.getClipById(id);
+    if (updated) {
+      // Sync to sidecar JSON file on disk if it exists per CONTRACTS.md §6
+      this.syncSidecarFileOnDisk(updated);
+    }
+
+    return updated;
+  }
+
+  private syncSidecarFileOnDisk(clip: ClipSidecar): void {
+    try {
+      const sidecarPath = clip.media.file.replace(/\.mp4$/, '.json');
+      if (fs.existsSync(sidecarPath)) {
+        const raw = fs.readFileSync(sidecarPath, 'utf-8');
+        const sidecar = JSON.parse(raw);
+        sidecar.review = {
+          status: clip.review.status,
+          title: clip.review.title,
+          tags: clip.review.tags,
+          notes: clip.review.notes
+        };
+
+        // Write then rename for atomic file update per CONTRACTS §6
+        const tmpPath = `${sidecarPath}.tmp.${Date.now()}`;
+        fs.writeFileSync(tmpPath, JSON.stringify(sidecar, null, 2), 'utf-8');
+        fs.renameSync(tmpPath, sidecarPath);
+      }
+    } catch {
+      // Best-effort file sync if disk path is not accessible
+    }
+  }
+
   public seedSession(session: Session): void {
     const stmt = this.db.prepare(`
       INSERT OR REPLACE INTO sessions (
@@ -183,8 +306,8 @@ export class DatabaseService {
       session.status,
       session.started_at,
       session.ended_at,
-      session.created_at,
-      session.updated_at
+      session.created_at || new Date().toISOString(),
+      session.updated_at || new Date().toISOString()
     );
   }
 
@@ -262,6 +385,21 @@ export class DatabaseService {
       clip.created_at,
       clip.created_at
     );
+  }
+
+  private mapRowToDetection(r: Record<string, unknown>): Detection {
+    return {
+      id: r.id as string,
+      session_id: r.session_id as string,
+      source_label: r.source_label as string,
+      source_domain: r.source_domain as string,
+      t_stream: r.t_stream as number,
+      t_wall: r.t_wall as string,
+      fused_score: r.fused_score as number,
+      signals: typeof r.signals === 'string' ? JSON.parse(r.signals) : (r.signals as Record<string, unknown>),
+      status: r.status as Detection['status'],
+      created_at: r.created_at as string | undefined
+    };
   }
 
   private mapRowToClipSidecar(r: Record<string, unknown>): ClipSidecar {

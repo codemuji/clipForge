@@ -44,8 +44,8 @@ export const Header: React.FC<HeaderProps> = ({
         </button>
 
         <button
-          className="nav-tab"
-          onClick={() => alert('Storage Browser view: see clips on disk in storage/clips/')}
+          className={`nav-tab ${activeView === 'storage' ? 'active' : ''}`}
+          onClick={() => onSelectView('storage')}
           data-testid="nav-tab-storage"
         >
           Storage Browser

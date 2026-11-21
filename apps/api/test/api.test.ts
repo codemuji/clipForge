@@ -315,6 +315,134 @@ test('GET /api/clips/:id returns a single clip or 404 with standard error shape'
   db.close();
 });
 
+test('PATCH /api/clips/:id/review updates only review.* fields and performs round-trip', async () => {
+  const db = createSeededDatabase();
+  const app = createApp({ db });
+
+  const initialClip = db.getClipById('clip_01');
+  assert.ok(initialClip);
+
+  const patchRes = await app.inject({
+    method: 'PATCH',
+    url: '/api/clips/clip_01/review',
+    payload: {
+      status: 'approved',
+      title: 'Incredible 1v4 Ace',
+      tags: ['clutch', 'ace', 'valo'],
+      notes: 'Clean spray transfer at 12s'
+    }
+  });
+
+  assert.equal(patchRes.statusCode, 200);
+  const updatedClip = JSON.parse(patchRes.body);
+
+  // Review fields are updated
+  assert.equal(updatedClip.review.status, 'approved');
+  assert.equal(updatedClip.review.title, 'Incredible 1v4 Ace');
+  assert.deepEqual(updatedClip.review.tags, ['clutch', 'ace', 'valo']);
+  assert.equal(updatedClip.review.notes, 'Clean spray transfer at 12s');
+
+  // Non-review fields are strictly UNCHANGED per CONTRACTS.md §6
+  assert.deepEqual(updatedClip.source, initialClip.source);
+  assert.deepEqual(updatedClip.detection, initialClip.detection);
+  assert.deepEqual(updatedClip.media, initialClip.media);
+  assert.equal(updatedClip.clip_id, initialClip.clip_id);
+  assert.equal(updatedClip.created_at, initialClip.created_at);
+
+  db.close();
+});
+
+test('PATCH /api/clips/:id/review rejects invalid status values', async () => {
+  const db = createSeededDatabase();
+  const app = createApp({ db });
+
+  const patchRes = await app.inject({
+    method: 'PATCH',
+    url: '/api/clips/clip_01/review',
+    payload: {
+      status: 'super_hyped'
+    }
+  });
+
+  assert.equal(patchRes.statusCode, 400);
+  const errData = JSON.parse(patchRes.body);
+  assert.equal(errData.error.code, 'INVALID_STATUS');
+  assert.ok(errData.error.message.includes('unreviewed, approved, rejected, favorited'));
+
+  db.close();
+});
+
+test('PATCH /api/clips/:id/review returns 404 for nonexistent clip', async () => {
+  const db = createSeededDatabase();
+  const app = createApp({ db });
+
+  const patchRes = await app.inject({
+    method: 'PATCH',
+    url: '/api/clips/nonexistent_clip/review',
+    payload: {
+      status: 'approved'
+    }
+  });
+
+  assert.equal(patchRes.statusCode, 404);
+  const errData = JSON.parse(patchRes.body);
+  assert.equal(errData.error.code, 'CLIP_NOT_FOUND');
+
+  db.close();
+});
+
+test('POST /api/detections/:id/dismiss marks detection dismissed and prevents clip job creation', async () => {
+  const db = createSeededDatabase();
+  const app = createApp({ db });
+
+  // 1. Initial state
+  const detBefore = db.getDetectionById('det_02');
+  assert.ok(detBefore);
+  assert.equal(detBefore.status, 'scored');
+  assert.equal(db.canCreateClipJob('det_02'), true);
+
+  // 2. Dismiss via API
+  const dismissRes = await app.inject({
+    method: 'POST',
+    url: '/api/detections/det_02/dismiss'
+  });
+
+  assert.equal(dismissRes.statusCode, 200);
+  const dismissedDet = JSON.parse(dismissRes.body);
+  assert.equal(dismissedDet.status, 'dismissed');
+
+  // 3. Verify DB state and clip job prevention (A-08 / C-03 rule)
+  const detAfter = db.getDetectionById('det_02');
+  assert.ok(detAfter);
+  assert.equal(detAfter.status, 'dismissed');
+  assert.equal(db.canCreateClipJob('det_02'), false);
+
+  assert.throws(
+    () => {
+      db.createClipJobFromDetection('det_02', 170.0, 190.0, 'storage/clips/test.mp4');
+    },
+    /Cannot create clip job for dismissed detection/
+  );
+
+  db.close();
+});
+
+test('POST /api/detections/:id/dismiss returns 404 for nonexistent detection', async () => {
+  const db = createSeededDatabase();
+  const app = createApp({ db });
+
+  const dismissRes = await app.inject({
+    method: 'POST',
+    url: '/api/detections/nonexistent_detection/dismiss'
+  });
+
+  assert.equal(dismissRes.statusCode, 404);
+  const errData = JSON.parse(dismissRes.body);
+  assert.equal(errData.error.code, 'DETECTION_NOT_FOUND');
+
+  db.close();
+});
+
 test('404 on unhandled routes returns error format matching CONTRACTS.md §7', async () => {
   const db = createSeededDatabase();
   const app = createApp({ db });
