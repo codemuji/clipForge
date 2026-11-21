@@ -2,11 +2,11 @@
 
 ## Current
 Ticket: A-06 Sampler
-State: IN PROGRESS
+State: READY
 Branch: lane/a
-PR: none
+PR: #17
 Blocked by: none
-Notes: Implementing rolling buffer sampler (frame extraction, 5s 16kHz WAV mono audio extraction, detector client with retry-then-null fallback, monotonicity enforcement).
+Notes: Implemented StreamSampler, MediaExtractor (JPEG + 16kHz mono WAV extraction under real-time budget), DetectorClient with single retry and null-signal fallback, and strict monotonicity enforcement. All 44 tests pass.
 
 ## Done
 - A-01 Repo scaffold, Makefile, lint — MERGED (#2)
