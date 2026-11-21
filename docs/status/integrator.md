@@ -9,7 +9,7 @@ State: IDLE
 Branch: main
 PR: none
 Blocked by: none
-Notes: Phase 0 complete! Gate G0 passed. Phase 1 underway: A-07 merged (all signal inputs ready; A-08 Scorer and A-09 Cutter now fully unblocked). Watching for next PRs.
+Notes: Phase 0 complete! Gate G0 passed. Phase 1 underway: B-05 merged (unblocks B-06 Labelling tool; all 5 detector signals active). Watching for next PRs.
 
 ## Done
 - I-00 Repository bootstrap and branch protection — DONE
@@ -32,3 +32,4 @@ Notes: Phase 0 complete! Gate G0 passed. Phase 1 underway: A-07 merged (all sign
 - B-04 HUD text detection — MERGED (PR #16, commit ee4c06d)
 - A-06 Sampler — MERGED (PR #17, commit 7ebbbde)
 - A-07 Chat signal adapter — MERGED (PR #18, commit 4518929)
+- B-05 Frame classifier — MERGED (PR #19, commit 5974441)

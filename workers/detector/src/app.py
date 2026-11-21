@@ -12,6 +12,7 @@ from pydantic import BaseModel
 
 from .audio import AudioSignalExtractor
 from .cleanup import cleanup_window_files
+from .classifier import FrameClassifier
 from .keywords import SpeechKeywordExtractor
 from .ocr import HudTextExtractor
 from .schemas import (
@@ -36,6 +37,7 @@ app = FastAPI(
 audio_extractor = AudioSignalExtractor()
 keyword_extractor = SpeechKeywordExtractor()
 hud_extractor = HudTextExtractor()
+frame_classifier = FrameClassifier()
 
 
 class KeywordsUpdate(BaseModel):
@@ -132,6 +134,15 @@ def get_hud_patterns() -> Dict[str, Any]:
     }
 
 
+@app.get("/v1/classifier/labels")
+def get_classifier_labels() -> Dict[str, Any]:
+    """Returns active frame classifier label map and execution provider info."""
+    return {
+        "active_provider": frame_classifier.active_provider,
+        "labels": frame_classifier.label_map,
+    }
+
+
 @app.post("/v1/session/{session_id}/reset")
 def reset_session(session_id: str) -> Dict[str, str]:
     """Resets detector rolling baselines (e.g. audio energy) for a session."""
@@ -169,13 +180,16 @@ def analyze(req: SamplerRequest) -> DetectorResponse:
             session_id=req.session_id,
         )
 
-        # 4. Remaining signals (Frame Classifier B-05)
-        # Missing signals return value: None (serialized as null in JSON)
+        # 4. Frame Classifier Signal Extraction (B-05)
+        frame_sig = frame_classifier.extract(
+            frame_path=req.frame_path,
+        )
+
         signals = DetectorSignals(
             audio=audio_sig,
             speech_keywords=keyword_sig,
             hud_text=hud_sig,
-            frame_classifier=FrameClassifierSignal(value=None),
+            frame_classifier=frame_sig,
         )
 
         latency_ms = round((time.perf_counter() - t_start) * 1000.0, 2)
