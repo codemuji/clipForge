@@ -1,11 +1,12 @@
 # Lane B status
 
 ## Current
-Ticket: S0-2
+Ticket: B-01
 State: READY
 Branch: lane/b
-PR: #6
+PR: #9
 Blocked by: none
-Notes: S0-2 completed, ADR-002 written, waiting for Integrator review
+Notes: B-01 Detector service scaffold completed, all tests passing, waiting for Integrator review
 
 ## Done
+- S0-2 Detector model spike — MERGED (PR #6)
