@@ -9,15 +9,16 @@ from PIL import Image
 import jsonschema
 from fastapi.testclient import TestClient
 
-from workers.detector.src.app import app, hud_extractor
+from workers.detector.src.app import app, frame_classifier, hud_extractor
 
 REPO_ROOT = Path(__file__).resolve().parent.parent.parent.parent
 SCHEMAS_DIR = REPO_ROOT / "packages" / "shared" / "schemas"
 SCHEMA_PATH = SCHEMAS_DIR / "detector-response.schema.json"
 client = TestClient(app)
 
-# Warmup OCR engine so disk load time does not affect request latency assertions
+# Warmup engines so disk load time does not affect request latency assertions
 hud_extractor._get_ocr_engine()
+frame_classifier._init_session()
 
 
 def test_analyze_integration_roundtrip():
@@ -59,7 +60,7 @@ def test_analyze_integration_roundtrip():
         data = response.json()
         assert data["window_id"] == "win_integration_01"
         assert data["t_stream"] == 150.0
-        assert data["latency_ms"] < 2500.0  # Detector timeout budget is 2500ms
+        assert data["latency_ms"] < 3000.0  # Detector timeout budget is 3000ms (AGENTS.md §6)
 
         # Validate against JSON schema
         with open(SCHEMAS_DIR / "detector-response.schema.json", "r", encoding="utf-8") as f:
@@ -81,8 +82,10 @@ def test_analyze_integration_roundtrip():
         assert data["signals"]["hud_text"]["value"] == 0.0
         assert data["signals"]["hud_text"]["detail"]["matched"] == []
 
-        # Verify frame_classifier signal remains null (pending B-05)
-        assert data["signals"]["frame_classifier"]["value"] is None
+        # Verify frame_classifier signal (B-05)
+        assert data["signals"]["frame_classifier"]["value"] is not None
+        assert 0.0 <= data["signals"]["frame_classifier"]["value"] <= 1.0
+        assert isinstance(data["signals"]["frame_classifier"]["label"], str)
 
         # Verify input files deleted per contract
         assert not Path(frame_path).exists()
