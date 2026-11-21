@@ -2,11 +2,11 @@
 
 ## Current
 Ticket: A-04 Ingest with reconnect
-State: IN PROGRESS
+State: READY
 Branch: lane/a
-PR: none
+PR: #14
 Blocked by: none
-Notes: Starting A-04 Ingest with reconnect (stream ingest wrapper, exponential backoff reconnect, state transitions, HLS disconnect test).
+Notes: A-04 implemented and verified. PR #14 opened, waiting for Integrator review.
 
 ## Done
 - A-01 Repo scaffold, Makefile, lint — MERGED (#2)
