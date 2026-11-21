@@ -9,6 +9,7 @@ from typing import Any, Dict
 from fastapi import FastAPI, HTTPException, status
 from fastapi.responses import JSONResponse
 
+from .audio import AudioSignalExtractor
 from .cleanup import cleanup_window_files
 from .schemas import (
     AudioSignal,
@@ -27,6 +28,9 @@ app = FastAPI(
     description="Local Autonomous Highlight Clipping Detector Worker",
     version="0.1.0",
 )
+
+# Signal extractors
+audio_extractor = AudioSignalExtractor()
 
 
 def get_gpu_info() -> Dict[str, Any]:
@@ -70,6 +74,13 @@ def health() -> HealthResponse:
     )
 
 
+@app.post("/v1/session/{session_id}/reset")
+def reset_session(session_id: str) -> Dict[str, str]:
+    """Resets detector rolling baselines (e.g. audio energy) for a session."""
+    audio_extractor.reset_session(session_id)
+    return {"status": "ok", "session_id": session_id, "message": "Baseline reset"}
+
+
 @app.post("/v1/analyze", response_model=DetectorResponse)
 def analyze(req: SamplerRequest) -> DetectorResponse:
     """Evaluates a stream window (audio + frame) and returns hype signal scores.
@@ -80,11 +91,17 @@ def analyze(req: SamplerRequest) -> DetectorResponse:
     t_start = time.perf_counter()
 
     try:
-        # B-01: Detector service scaffold
-        # Signal extractors (Audio B-02, Whisper B-03, HUD B-04, Frame Classifier B-05)
+        # 1. Audio Signal Extraction (B-02)
+        audio_sig = audio_extractor.extract(
+            audio_path=req.audio_path,
+            session_id=req.session_id,
+            sample_rate=req.audio_sample_rate,
+        )
+
+        # 2. Remaining signals (Whisper B-03, HUD B-04, Frame Classifier B-05)
         # Missing signals return value: None (serialized as null in JSON)
         signals = DetectorSignals(
-            audio=AudioSignal(value=None),
+            audio=audio_sig,
             speech_keywords=SpeechKeywordsSignal(value=None),
             hud_text=HudTextSignal(value=None),
             frame_classifier=FrameClassifierSignal(value=None),
