@@ -1,0 +1,7 @@
+.venv/
+7zip/
+tesseract/
+spike/models/
+spike/data/
+__pycache__/
+*.pyc
