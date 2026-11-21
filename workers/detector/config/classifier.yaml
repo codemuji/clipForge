@@ -1,0 +1,30 @@
+# MobileNetV3-small Frame Classifier Configuration
+# Maps predicted class indices to gameplay states and hype signal weights
+
+model:
+  name: "mnv3s-v0.2"
+  input_size: [224, 224]
+  mean: [0.485, 0.456, 0.406]
+  std: [0.229, 0.224, 0.225]
+
+labels:
+  0:
+    name: "idle"
+    weight: 0.05
+    description: "Static, loading screen, or inactive display"
+  1:
+    name: "lobby"
+    weight: 0.15
+    description: "In-game menu, lobby, character loadout"
+  2:
+    name: "action"
+    weight: 0.75
+    description: "Active gameplay, movement, combat"
+  3:
+    name: "elimination"
+    weight: 0.85
+    description: "Player knockout, kill notification, respawn"
+  4:
+    name: "victory"
+    weight: 0.95
+    description: "Victory banner, podium, celebration screen"
