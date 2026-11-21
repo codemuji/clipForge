@@ -1,11 +1,11 @@
 # Lane B status
 
 ## Current
-Ticket: none
-State: IDLE
+Ticket: S0-2
+State: READY
 Branch: lane/b
-PR: none
+PR: #6
 Blocked by: none
-Notes: waiting for I-00
+Notes: S0-2 completed, ADR-002 written, waiting for Integrator review
 
 ## Done

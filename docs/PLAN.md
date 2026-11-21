@@ -162,10 +162,10 @@ Acceptance:
 - [ ] `packages/shared/schemas/*.json` generated from `CONTRACTS.md`.
 
 ### Gate G0 — Analysis complete
-- [ ] ADR-001, ADR-002, ADR-003 merged.
-- [ ] Contracts frozen at v0.1.0.
-- [ ] CI-01 green on `main`.
-- [ ] Fixtures merged or fetched by script.
+- [x] ADR-001, ADR-002, ADR-003 merged.
+- [x] Contracts frozen at v0.1.0.
+- [x] CI-01 green on `main`.
+- [x] Fixtures merged or fetched by script.
 
 ---
 
@@ -345,7 +345,7 @@ The Integrator fills these in when each gate passes. Lane agents do not edit thi
 
 | Gate | Status | Date | Evidence |
 |---|---|---|---|
-| G0 Analysis | pending | | |
+| G0 Analysis | PASSED | 2026-11-21 | ADR-001 (PR #3), ADR-002 (PR #6), ADR-003 (PR #1) merged; contracts v0.1.0 & schemas/fixtures merged (PR #3); CI green |
 | G1 Execution | pending | | |
 | G2 Debugging | pending | | |
 | G3 Testing | pending | | |

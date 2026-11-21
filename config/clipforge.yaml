@@ -1,11 +1,9 @@
-# sources allow-list; orchestrator refuses anything not listed
-sources:
-  - url: "https://www.twitch.tv/example_channel"
-    label: "example-channel"
-    enabled: true
+# clipforge configuration (shipped with empty allow-list per AGENTS.md §10)
+# Add your permitted channel URLs here before running the pipeline.
+sources: []
 
 buffer:
-  minutes: 10
+  minutes: 10               # rolling window kept on disk
   segment_seconds: 2
 
 sampling:
@@ -13,9 +11,9 @@ sampling:
   audio_window_seconds: 5
 
 scoring:
-  threshold: 0.72
-  cooldown_seconds: 45
-  debounce_windows: 2
+  threshold: 0.72           # fused score that triggers a clip
+  cooldown_seconds: 45      # no second clip from the same burst
+  debounce_windows: 2       # score must stay above threshold for N windows
   weights:
     audio: 0.35
     chat: 0.25
@@ -26,7 +24,7 @@ scoring:
 clip:
   pre_seconds: 10
   post_seconds: 8
-  encode: "copy"
+  encode: "copy"            # "copy" | "h264_nvenc" | "h264_cpu"
   vertical: false
 
 detector:
