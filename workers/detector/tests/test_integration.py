@@ -60,7 +60,7 @@ def test_analyze_integration_roundtrip():
         data = response.json()
         assert data["window_id"] == "win_integration_01"
         assert data["t_stream"] == 150.0
-        assert data["latency_ms"] < 3000.0  # Detector timeout budget is 3000ms (AGENTS.md §6)
+        assert data["latency_ms"] < 5000.0  # Detector timeout budget is 5000ms (CONTRACTS §2)
 
         # Validate against JSON schema
         with open(SCHEMAS_DIR / "detector-response.schema.json", "r", encoding="utf-8") as f:
