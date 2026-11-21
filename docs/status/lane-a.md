@@ -2,11 +2,11 @@
 
 ## Current
 Ticket: A-09 Cutter and sidecar
-State: IN PROGRESS
+State: READY
 Branch: lane/a
-PR: none
+PR: #22
 Blocked by: none
-Notes: Implementing buffer clip cutter, window clamping [t - pre, t + post], job state transitions (queued -> cutting -> encoded/failed), NVENC with CPU fallback, AGENTS §4 path layout, and sidecar metadata generator.
+Notes: Implemented buffer clip cutter, window clamping [t - pre, t + post], job state transitions (queued -> cutting -> encoded/failed), NVENC with CPU fallback, AGENTS §4 path layout, and sidecar metadata generator with write-then-rename. 61/61 tests pass.
 
 ## Done
 - A-01 Repo scaffold, Makefile, lint — MERGED (#2)
