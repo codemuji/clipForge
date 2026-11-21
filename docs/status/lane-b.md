@@ -2,11 +2,11 @@
 
 ## Current
 Ticket: B-04
-State: IN PROGRESS
+State: READY
 Branch: lane/b
-PR: none
+PR: #16
 Blocked by: none
-Notes: Implementing B-04 HUD text detection (RapidOCR PP-OCRv4 ONNX, HUD crop regions, pattern matching, <= 1 call / 2 s rate limit)
+Notes: B-04 HUD text detection PR #16 opened, awaiting Integrator review and merge.
 
 ## Done
 - S0-2 Detector model spike — MERGED (PR #6)
