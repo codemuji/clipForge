@@ -1,0 +1,25 @@
+# clipforge chat test fixture log
+# format: [t_stream_seconds] username: message_content
+[1.0] chatter_alpha: hello stream
+[1.5] chatter_beta: hey everyone
+[2.0] chatter_alpha: what game is this
+[3.5] chatter_gamma: lets go!
+[4.0] chatter_delta: poggies
+[10.0] chatter_alpha: quiet moment
+[20.0] chatter_beta: still watching
+[25.0] chatter_alpha: WAIT WHAT
+[25.2] chatter_beta: POG
+[25.5] chatter_gamma: NO WAY
+[25.8] chatter_delta: CLUTCH
+[26.0] chatter_epsilon: OMG
+[26.2] chatter_zeta: INSANE
+[26.5] chatter_eta: LETS GOOO
+[27.0] chatter_alpha: THAT WAS NUTS
+[27.5] chatter_beta: 1v4 ACE
+[28.0] chatter_theta: CLIP THAT
+[28.5] chatter_iota: CLIP IT
+[29.0] chatter_kappa: WOW
+[29.5] chatter_lambda: GOAT
+[30.0] chatter_alpha: replay please
+[45.0] chatter_beta: calming down
+[50.0] chatter_gamma: gg
