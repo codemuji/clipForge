@@ -2,11 +2,11 @@
 
 ## Current
 Ticket: A-05 Rolling buffer and eviction
-State: IN PROGRESS
+State: READY
 Branch: lane/a
-PR: none
+PR: #15
 Blocked by: none
-Notes: Starting A-05 Rolling buffer and eviction (buffer window management, segment eviction worker, job protection enforcement).
+Notes: Implemented BufferManager with sliding retention window (bufferMinutes + marginSeconds), index parsing, SQLite clip job protection query integration (prevents unlinking queued/cutting segments), and disk usage metrics. Tested with 40/40 passing unit and integration tests.
 
 ## Done
 - A-01 Repo scaffold, Makefile, lint — MERGED (#2)
