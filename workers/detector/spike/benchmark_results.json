@@ -1,0 +1,84 @@
+{
+  "hardware": {
+    "cpu": "AMD Ryzen 5 7000-series (HS)",
+    "gpu": "NVIDIA GeForce RTX 3050 Laptop GPU (6144 MB VRAM)",
+    "os": "Windows 11 / WSL2",
+    "python": "3.11.18"
+  },
+  "whisper": {
+    "base.en": {
+      "audio_duration_s": 10.0,
+      "avg_transcribe_time_s": 1.551,
+      "rtf": 0.1551,
+      "p95_time_s": 1.945,
+      "threads": 6,
+      "meets_budget": true
+    },
+    "base.en-q5_1": {
+      "audio_duration_s": 10.0,
+      "avg_transcribe_time_s": 1.341,
+      "rtf": 0.1341,
+      "p95_time_s": 1.372,
+      "threads": 6,
+      "meets_budget": true
+    },
+    "small.en": {
+      "audio_duration_s": 10.0,
+      "avg_transcribe_time_s": 3.76,
+      "rtf": 0.376,
+      "p95_time_s": 4.31,
+      "threads": 6,
+      "meets_budget": true
+    },
+    "small.en-q5_1": {
+      "audio_duration_s": 10.0,
+      "avg_transcribe_time_s": 4.123,
+      "rtf": 0.4123,
+      "p95_time_s": 4.168,
+      "threads": 6,
+      "meets_budget": true
+    }
+  },
+  "ocr": {
+    "dataset_frames": 50,
+    "paddleocr": {
+      "engine": "PaddleOCR (RapidOCR PP-OCRv4 ONNX)",
+      "exact_match_pct": 34.0,
+      "char_similarity_avg_pct": 91.2,
+      "latency_mean_ms": 681.2,
+      "latency_p50_ms": 669.75,
+      "latency_p95_ms": 786.31,
+      "meets_budget": true
+    },
+    "tesseract": {
+      "engine": "Tesseract 5.4.0 (--psm 7)",
+      "exact_match_pct": 42.0,
+      "char_similarity_avg_pct": 86.2,
+      "latency_mean_ms": 153.79,
+      "latency_p50_ms": 147.86,
+      "latency_p95_ms": 197.0,
+      "meets_budget": true
+    }
+  },
+  "mobilenetv3": {
+    "cuda": {
+      "available": true,
+      "latency_mean_ms": 1.66,
+      "latency_p50_ms": 1.62,
+      "latency_p95_ms": 2.14,
+      "latency_min_ms": 1.29,
+      "vram_allocated_mb": 0.0,
+      "vram_total_used_mb": 0.0,
+      "vram_budget_limit_mb": 1024.0,
+      "latency_budget_limit_ms": 30.0,
+      "meets_latency_budget": true,
+      "meets_vram_budget": true
+    },
+    "cpu_fallback": {
+      "latency_mean_ms": 1.52,
+      "latency_p50_ms": 1.5,
+      "latency_p95_ms": 1.76,
+      "meets_latency_budget": true
+    }
+  }
+}
