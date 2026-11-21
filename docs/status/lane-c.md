@@ -1,14 +1,14 @@
 # Lane C status
 
 ## Current
-Ticket: C-02 Dashboard shell
-State: READY
+Ticket: C-03 Review actions
+State: IN PROGRESS
 Branch: lane/c
-PR: #7
+PR: none
 Blocked by: none
-Notes: C-02 implemented, built, and tested. PR #7 opened, waiting for Integrator review.
+Notes: Implementing PATCH /clips/:id/review and POST /detections/:id/dismiss endpoints with UI review actions.
 
 ## Done
 - S0-3 Product and data spike — DONE (PR #1)
 - C-01 API skeleton (read-only) — DONE (PR #4)
-- C-02 Dashboard shell — READY (PR #7)
+- C-02 Dashboard shell — DONE (PR #7)
