@@ -1,12 +1,12 @@
 # Lane A status
 
 ## Current
-Ticket: A-07 Chat signal adapter
-State: READY
+Ticket: A-08 Scorer
+State: IN PROGRESS
 Branch: lane/a
-PR: #18
+PR: none
 Blocked by: none
-Notes: Implemented ChatSignalAdapter with aggregate counts, rate-limiting, rolling pruning, disabled-by-default behavior, and zero text/username retention. Verified with 48/48 passing tests.
+Notes: Implementing signal fusion engine, weight renormalization on null signals, debounce and cooldown state machines, and detection event emission.
 
 ## Done
 - A-01 Repo scaffold, Makefile, lint — MERGED (#2)
@@ -17,3 +17,4 @@ Notes: Implemented ChatSignalAdapter with aggregate counts, rate-limiting, rolli
 - A-04 Ingest with reconnect — MERGED (#14)
 - A-05 Rolling buffer and eviction — MERGED (#15)
 - A-06 Sampler — MERGED (#17)
+- A-07 Chat signal adapter — MERGED (#18)
