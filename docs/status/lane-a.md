@@ -1,12 +1,12 @@
 # Lane A status
 
 ## Current
-Ticket: A-06 Sampler
-State: READY
+Ticket: A-07 Chat signal adapter
+State: IN PROGRESS
 Branch: lane/a
-PR: #17
+PR: none
 Blocked by: none
-Notes: Implemented StreamSampler, MediaExtractor (JPEG + 16kHz mono WAV extraction under real-time budget), DetectorClient with single retry and null-signal fallback, and strict monotonicity enforcement. All 44 tests pass.
+Notes: Implementing chat signal adapter (aggregate count aggregation from fixture logs/mock streams, zero text/username retention per AGENTS.md §10, disabled-by-default behavior).
 
 ## Done
 - A-01 Repo scaffold, Makefile, lint — MERGED (#2)
@@ -16,3 +16,4 @@ Notes: Implemented StreamSampler, MediaExtractor (JPEG + 16kHz mono WAV extracti
 - A-03 SQLite store and migrations — MERGED (#8)
 - A-04 Ingest with reconnect — MERGED (#14)
 - A-05 Rolling buffer and eviction — MERGED (#15)
+- A-06 Sampler — MERGED (#17)
