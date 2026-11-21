@@ -2,11 +2,11 @@
 
 ## Current
 Ticket: A-03 SQLite store and migrations
-State: IN PROGRESS
+State: READY
 Branch: lane/a
-PR: none
+PR: #8
 Blocked by: none
-Notes: Implementing SQLite store, idempotent migration runner, typed repository, eviction protection, and cross-lane build/test integration
+Notes: PR #8 opened (SQLite store, idempotent migrations, typed repository, eviction protection). Waiting for Integrator review.
 
 ## Done
 - A-01 Repo scaffold, Makefile, lint — MERGED (#2)
