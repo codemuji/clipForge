@@ -47,3 +47,4 @@ export * from './ingest/index.js';
 export * from './buffer/index.js';
 export * from './sampler/index.js';
 export * from './chat/index.js';
+export * from './scorer/index.js';

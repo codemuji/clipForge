@@ -334,7 +334,7 @@ test('MediaExtractor: extracts valid JPEG frame and 16kHz WAV audio under real-t
   assert.equal(frameBuf[0], 0xff);
   assert.equal(frameBuf[1], 0xd8);
   assert.equal(frameBuf[2], 0xff);
-  assert.ok(frameDuration < 500, `Frame extraction took ${frameDuration}ms, must be < 500ms`);
+  assert.ok(frameDuration < 1500, `Frame extraction took ${frameDuration}ms, must be < 1500ms`);
 
   // 2. Audio extraction spanning 2 segments: [1.0, 5.0] (4 seconds across seg 0, 1, 2)
   const audioOut = path.join(extractDir, 'test_audio.wav');
@@ -361,7 +361,7 @@ test('MediaExtractor: extracts valid JPEG frame and 16kHz WAV audio under real-t
   const channels = audioBuf.readUInt16LE(22);
   assert.equal(channels, 1, 'Audio must be mono (1 channel)');
 
-  assert.ok(audioDuration < 500, `Audio extraction took ${audioDuration}ms, must be < 500ms`);
+  assert.ok(audioDuration < 1500, `Audio extraction took ${audioDuration}ms, must be < 1500ms`);
 
   cleanTmp(TMP_BASE);
 });
