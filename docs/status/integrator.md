@@ -20,3 +20,4 @@ Notes: Phase 0 complete! Gate G0 passed. Watching for PRs from Phase 1.
 - A-02 Config loader and validation — MERGED (PR #5, commit ce08846)
 - S0-2 Detector model spike — MERGED (PR #6, commit dbaba7f)
 - Gate G0 Analysis complete — PASSED (2026-11-21)
+- C-02 Dashboard shell — MERGED (PR #7, commit 11d9753)
