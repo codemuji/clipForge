@@ -2,11 +2,11 @@
 
 ## Current
 Ticket: A-08 Scorer
-State: IN PROGRESS
+State: READY
 Branch: lane/a
-PR: none
+PR: #20
 Blocked by: none
-Notes: Implementing signal fusion engine, weight renormalization on null signals, debounce and cooldown state machines, and detection event emission.
+Notes: Implemented HypeScorer with signal fusion, weight renormalization over non-null signals, all-null emission suppression, debounce and cooldown state machines, and SQLite persistence. Verified with 52/52 passing tests.
 
 ## Done
 - A-01 Repo scaffold, Makefile, lint — MERGED (#2)
