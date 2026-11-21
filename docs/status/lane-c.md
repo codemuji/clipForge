@@ -2,11 +2,11 @@
 
 ## Current
 Ticket: C-06 Storage browser
-State: IN PROGRESS
+State: READY
 Branch: lane/c
-PR: none
+PR: #12
 Blocked by: none
-Notes: Building storage browser tree endpoint, reveal-in-explorer (Windows + Linux), and dashboard storage tree UI.
+Notes: Implemented GET /api/storage/tree (reflects disk state, directories sorted first, file metadata, stats) and POST /api/storage/reveal (cross-platform OS file manager integration with path traversal guard). Created dashboard StorageBrowser component with tree view, summary cards, and reveal buttons. All 16 API tests and 12 Dashboard component tests passing, monorepo lint and test scripts passing.
 
 ## Done
 - S0-3 Product and data spike — DONE (PR #1)
