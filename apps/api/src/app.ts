@@ -65,6 +65,26 @@ export function createApp(options: AppOptions = {}): FastifyInstance {
     });
   });
 
+  // POST /api/detections/:id/dismiss - marks detection dismissed
+  app.post<{
+    Params: {
+      id: string;
+    };
+  }>('/api/detections/:id/dismiss', async (request, reply) => {
+    const { id } = request.params;
+    const updated = db.dismissDetection(id);
+    if (!updated) {
+      return reply.status(404).send({
+        error: {
+          code: 'DETECTION_NOT_FOUND',
+          message: `Detection not found: ${id}`,
+          correlation_id: id
+        }
+      });
+    }
+    return updated;
+  });
+
   // GET /api/clips?status=&source= - list clips with sidecar data
   app.get<{
     Querystring: {
@@ -97,6 +117,46 @@ export function createApp(options: AppOptions = {}): FastifyInstance {
       });
     }
     return clip;
+  });
+
+  // PATCH /api/clips/:id/review - updates only review.* fields per CONTRACTS §6 & §7
+  app.patch<{
+    Params: {
+      id: string;
+    };
+    Body: {
+      status?: string;
+      title?: string | null;
+      tags?: string[];
+      notes?: string | null;
+    };
+  }>('/api/clips/:id/review', async (request, reply) => {
+    const { id } = request.params;
+    const body = request.body || {};
+
+    const validStatuses = ['unreviewed', 'approved', 'rejected', 'favorited'];
+    if (body.status && !validStatuses.includes(body.status)) {
+      return reply.status(400).send({
+        error: {
+          code: 'INVALID_STATUS',
+          message: `Status must be one of: ${validStatuses.join(', ')}`,
+          correlation_id: id
+        }
+      });
+    }
+
+    const updated = db.updateClipReview(id, body);
+    if (!updated) {
+      return reply.status(404).send({
+        error: {
+          code: 'CLIP_NOT_FOUND',
+          message: `Clip not found: ${id}`,
+          correlation_id: id
+        }
+      });
+    }
+
+    return updated;
   });
 
   // GET /api/health - returns {status, detector, buffer_free_gb, gpu}

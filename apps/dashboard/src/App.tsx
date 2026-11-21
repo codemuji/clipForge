@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import type { ViewMode, Session, Detection, ClipSidecar, HealthResponse } from './types.js';
-import { fetchHealth, fetchSessions, fetchDetections, fetchClips } from './api.js';
+import { fetchHealth, fetchSessions, fetchDetections, fetchClips, dismissDetection, updateClipReview } from './api.js';
 import { Header } from './components/Header.js';
 import { LiveDetectionsList } from './components/LiveDetectionsList.js';
 import { ClipGrid } from './components/ClipGrid.js';
@@ -51,10 +51,8 @@ export const App: React.FC = () => {
 
   useEffect(() => {
     if (!isPolling) return;
-    // Initial fetch
     pollLiveData();
 
-    // 2000 ms polling interval
     const interval = setInterval(() => {
       pollLiveData();
     }, 2000);
@@ -65,6 +63,34 @@ export const App: React.FC = () => {
   const handleSelectClip = (clipId: string) => {
     setActiveClipId(clipId);
     setActiveView('clip-detail');
+  };
+
+  const handleDismissDetection = async (id: string) => {
+    try {
+      const updated = await dismissDetection(id);
+      setDetections((prev) =>
+        prev.map((d) => (d.id === id ? { ...d, status: updated.status } : d))
+      );
+    } catch {
+      // Handle error
+    }
+  };
+
+  const handleSaveReview = async (reviewData: {
+    status: string;
+    title: string;
+    tags: string[];
+    notes: string;
+  }) => {
+    if (!activeClipId) return;
+    try {
+      const updated = await updateClipReview(activeClipId, reviewData);
+      setClips((prev) =>
+        prev.map((c) => (c.clip_id === updated.clip_id ? updated : c))
+      );
+    } catch {
+      // Handle error
+    }
   };
 
   const activeClip = clips.find((c) => c.clip_id === activeClipId) || clips[0];
@@ -92,6 +118,7 @@ export const App: React.FC = () => {
             onChangeMinScore={setMinScore}
             isPolling={isPolling}
             onSelectClip={handleSelectClip}
+            onDismiss={handleDismissDetection}
           />
         )}
 
@@ -110,9 +137,7 @@ export const App: React.FC = () => {
           <ClipDetail
             clip={activeClip}
             onBack={() => setActiveView('clips')}
-            onSaveReview={(data) => {
-              alert(`Review saved: ${data.status} - ${data.title}`);
-            }}
+            onSaveReview={handleSaveReview}
             onTrim={(offsets) => {
               alert(`Recutting clip with start: ${offsets.startOffset}s, end: ${offsets.endOffset}s`);
             }}

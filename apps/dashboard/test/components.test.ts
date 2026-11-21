@@ -356,3 +356,38 @@ test('ClipDetail component: renders video player, metadata, signals, review form
   assert.ok(html.includes('Vertical Crop (9:16 Center-Weighted)'), 'Renders vertical crop toggle');
   assert.ok(html.includes('Burn Captions (Whisper Subtitles)'), 'Renders captions toggle');
 });
+
+test('LiveDetectionsList component: renders dismiss button for active detections and invokes onDismiss', () => {
+  let dismissedId = '';
+  const html = renderToStaticMarkup(
+    React.createElement(LiveDetectionsList, {
+      sessions: mockSessions,
+      activeSessionId: 'sess_01',
+      onSelectSession: () => {},
+      detections: mockDetections,
+      minScore: 0,
+      onChangeMinScore: () => {},
+      onDismiss: (id) => {
+        dismissedId = id;
+      }
+    })
+  );
+
+  assert.ok(html.includes('Dismiss'), 'Renders dismiss button for active detections');
+  assert.ok(html.includes('dismiss-btn-det_01'), 'Contains dismiss button with testid');
+});
+
+test('ClipDetail component: renders save review action with review status select', () => {
+  const html = renderToStaticMarkup(
+    React.createElement(ClipDetail, {
+      clip: mockClips[0],
+      onBack: () => {},
+      onSaveReview: () => {}
+    })
+  );
+
+  assert.ok(html.includes('Save Review'), 'Renders save review button');
+  assert.ok(html.includes('review-status-select'), 'Renders review status select input');
+  assert.ok(html.includes('review-title-input'), 'Renders title input');
+  assert.ok(html.includes('review-tags-input'), 'Renders tags input');
+});
