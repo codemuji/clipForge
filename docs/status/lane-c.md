@@ -1,11 +1,13 @@
 # Lane C status
 
 ## Current
-Ticket: none
-State: IDLE
+Ticket: C-01 API skeleton (read-only)
+State: READY
 Branch: lane/c
-PR: none
+PR: #4
 Blocked by: none
-Notes: waiting for I-00
+Notes: C-01 implemented and tested. PR #4 opened, waiting for Integrator review.
 
 ## Done
+- S0-3 Product and data spike — DONE (PR #1)
+- C-01 API skeleton (read-only) — READY (PR #4)

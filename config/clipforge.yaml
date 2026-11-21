@@ -1,0 +1,36 @@
+# clipforge configuration (shipped with empty allow-list per AGENTS.md §10)
+# Add your permitted channel URLs here before running the pipeline.
+sources: []
+
+buffer:
+  minutes: 10               # rolling window kept on disk
+  segment_seconds: 2
+
+sampling:
+  interval_seconds: 1.5
+  audio_window_seconds: 5
+
+scoring:
+  threshold: 0.72           # fused score that triggers a clip
+  cooldown_seconds: 45      # no second clip from the same burst
+  debounce_windows: 2       # score must stay above threshold for N windows
+  weights:
+    audio: 0.35
+    chat: 0.25
+    speech_keywords: 0.15
+    hud_text: 0.15
+    frame_classifier: 0.10
+
+clip:
+  pre_seconds: 10
+  post_seconds: 8
+  encode: "copy"            # "copy" | "h264_nvenc" | "h264_cpu"
+  vertical: false
+
+detector:
+  url: "http://127.0.0.1:8731"
+  timeout_ms: 2500
+
+storage:
+  root: "./storage"
+  retention_days: 30

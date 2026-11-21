@@ -1,0 +1,17 @@
+{
+  "name": "@clipforge/api",
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Clipforge REST API service (Fastify)",
+  "main": "./dist/src/index.js",
+  "types": "./dist/src/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "test": "tsc && node --test dist/test/**/*.test.js",
+    "start": "node dist/src/server.js"
+  },
+  "dependencies": {
+    "@clipforge/shared": "*",
+    "fastify": "^5.0.0"
+  }
+}

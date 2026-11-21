@@ -1,0 +1,47 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "clipforge.detection-event.v1",
+  "title": "DetectionEvent",
+  "type": "object",
+  "required": [
+    "id",
+    "session_id",
+    "source_label",
+    "source_domain",
+    "t_stream",
+    "t_wall",
+    "fused_score",
+    "signals",
+    "status"
+  ],
+  "properties": {
+    "id": { "type": "string" },
+    "session_id": { "type": "string" },
+    "source_label": { "type": "string" },
+    "source_domain": { "type": "string" },
+    "t_stream": { "type": "number", "minimum": 0 },
+    "t_wall": { "type": "string", "format": "date-time" },
+    "fused_score": { "type": "number", "minimum": 0, "maximum": 1 },
+    "signals": {
+      "type": "object",
+      "properties": {
+        "audio": { "type": "object" },
+        "chat": {
+          "type": "object",
+          "properties": {
+            "value": { "type": ["number", "null"], "minimum": 0, "maximum": 1 },
+            "detail": { "type": "object" }
+          }
+        },
+        "speech_keywords": { "type": "object" },
+        "hud_text": { "type": "object" },
+        "frame_classifier": { "type": "object" }
+      }
+    },
+    "status": {
+      "type": "string",
+      "enum": ["scored", "clipped", "dismissed", "error"]
+    }
+  },
+  "additionalProperties": false
+}
