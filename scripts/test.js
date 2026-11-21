@@ -19,6 +19,7 @@ if (!fs.existsSync(path.join(__dirname, '..', 'node_modules'))) {
 console.log('[TEST] Building packages...');
 run('npx tsc -p packages/shared/tsconfig.json');
 run('npx tsc -p apps/orchestrator/tsconfig.json');
+run('npx tsc -p apps/api/tsconfig.json');
 
 const args = process.argv.slice(2);
 const mode = args[0] || '--all';
@@ -43,7 +44,7 @@ if (mode === '--gpu') {
 } else {
   // Unit or all tests
   console.log('[TEST:UNIT] Running unit tests...');
-  run('node --test packages/shared/dist/test/*.test.js apps/orchestrator/dist/test/*.test.js');
+  run('node --test packages/shared/dist/test/*.test.js apps/orchestrator/dist/test/*.test.js apps/api/dist/test/*.test.js');
 }
 
 console.log('[TEST] Tests completed successfully.');

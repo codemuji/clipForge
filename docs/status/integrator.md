@@ -21,3 +21,6 @@ Notes: Phase 0 complete! Gate G0 passed. Watching for PRs from Phase 1.
 - S0-2 Detector model spike — MERGED (PR #6, commit dbaba7f)
 - Gate G0 Analysis complete — PASSED (2026-11-21)
 - C-02 Dashboard shell — MERGED (PR #7, commit 11d9753)
+- A-03 SQLite store and migrations — MERGED (PR #8, commit 1b26bc7)
+- B-01 Detector service scaffold — MERGED (PR #9, commit 27b4a25)
+- C-03 Review actions — MERGED (PR #10, commit dfa76fe)

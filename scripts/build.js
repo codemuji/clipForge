@@ -17,4 +17,5 @@ if (!fs.existsSync(path.join(__dirname, '..', 'node_modules'))) {
 console.log('[BUILD] Compiling TypeScript across workspaces...');
 run('npx tsc -p packages/shared/tsconfig.json');
 run('npx tsc -p apps/orchestrator/tsconfig.json');
+run('npx tsc -p apps/api/tsconfig.json');
 console.log('[BUILD] Build completed.');
