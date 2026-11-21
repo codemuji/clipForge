@@ -1,12 +1,12 @@
 # Lane A status
 
 ## Current
-Ticket: A-05 Rolling buffer and eviction
-State: READY
+Ticket: A-06 Sampler
+State: IN PROGRESS
 Branch: lane/a
-PR: #15
+PR: none
 Blocked by: none
-Notes: Implemented BufferManager with sliding retention window (bufferMinutes + marginSeconds), index parsing, SQLite clip job protection query integration (prevents unlinking queued/cutting segments), and disk usage metrics. Tested with 40/40 passing unit and integration tests.
+Notes: Implementing rolling buffer sampler (frame extraction, 5s 16kHz WAV mono audio extraction, detector client with retry-then-null fallback, monotonicity enforcement).
 
 ## Done
 - A-01 Repo scaffold, Makefile, lint — MERGED (#2)
@@ -15,3 +15,4 @@ Notes: Implemented BufferManager with sliding retention window (bufferMinutes + 
 - A-02 Config loader and validation — MERGED (#5)
 - A-03 SQLite store and migrations — MERGED (#8)
 - A-04 Ingest with reconnect — MERGED (#14)
+- A-05 Rolling buffer and eviction — MERGED (#15)
