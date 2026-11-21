@@ -61,6 +61,17 @@ def test_analyze_integration_roundtrip():
             schema = json.load(f)
         jsonschema.validate(instance=data, schema=schema)
 
+        # Verify audio signal is computed
+        assert data["signals"]["audio"]["value"] is not None
+        assert 0.0 <= data["signals"]["audio"]["value"] <= 1.0
+        assert "detail" in data["signals"]["audio"]
+        assert "lufs" in data["signals"]["audio"]["detail"]
+        assert "lufs_delta" in data["signals"]["audio"]["detail"]
+
+        # Verify remaining signals remain null in B-02
+        for key in ["speech_keywords", "hud_text", "frame_classifier"]:
+            assert data["signals"][key]["value"] is None
+
         # Verify input files deleted per contract
         assert not Path(frame_path).exists()
         assert not Path(wav_path).exists()
