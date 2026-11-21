@@ -2,11 +2,11 @@
 
 ## Current
 Ticket: A-07 Chat signal adapter
-State: IN PROGRESS
+State: READY
 Branch: lane/a
-PR: none
+PR: #18
 Blocked by: none
-Notes: Implementing chat signal adapter (aggregate count aggregation from fixture logs/mock streams, zero text/username retention per AGENTS.md §10, disabled-by-default behavior).
+Notes: Implemented ChatSignalAdapter with aggregate counts, rate-limiting, rolling pruning, disabled-by-default behavior, and zero text/username retention. Verified with 48/48 passing tests.
 
 ## Done
 - A-01 Repo scaffold, Makefile, lint — MERGED (#2)
