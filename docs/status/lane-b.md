@@ -2,11 +2,11 @@
 
 ## Current
 Ticket: B-06
-State: IN PROGRESS
+State: READY
 Branch: lane/b
-PR: none
+PR: #21
 Blocked by: none
-Notes: Implementing B-06 Labelling tool and evaluation (CSV of frame hashes, make eval:detector precision/recall/threshold sweep, toy set metric tests)
+Notes: B-06 Labelling tool and evaluation implemented and verified. PR #21 opened. Waiting for Integrator.
 
 ## Done
 - S0-2 Detector model spike — MERGED (PR #6)
