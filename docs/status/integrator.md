@@ -24,3 +24,5 @@ Notes: Phase 0 complete! Gate G0 passed. Watching for PRs from Phase 1.
 - A-03 SQLite store and migrations — MERGED (PR #8, commit 1b26bc7)
 - B-01 Detector service scaffold — MERGED (PR #9, commit 27b4a25)
 - C-03 Review actions — MERGED (PR #10, commit dfa76fe)
+- B-02 Audio signal — MERGED (PR #11, commit 14ad9ca)
+- C-06 Storage browser — MERGED (PR #12, commit b627e9a)

@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import type { ViewMode, Session, Detection, ClipSidecar, HealthResponse } from './types.js';
-import { fetchHealth, fetchSessions, fetchDetections, fetchClips, dismissDetection, updateClipReview } from './api.js';
+import type { ViewMode, Session, Detection, ClipSidecar, HealthResponse, StorageTreeResponse } from './types.js';
+import { fetchHealth, fetchSessions, fetchDetections, fetchClips, dismissDetection, updateClipReview, fetchStorageTree, revealStoragePath } from './api.js';
 import { Header } from './components/Header.js';
 import { LiveDetectionsList } from './components/LiveDetectionsList.js';
 import { ClipGrid } from './components/ClipGrid.js';
 import { ClipDetail } from './components/ClipDetail.js';
+import { StorageBrowser } from './components/StorageBrowser.js';
 
 export const App: React.FC = () => {
   const [activeView, setActiveView] = useState<ViewMode>('live');
@@ -15,6 +16,8 @@ export const App: React.FC = () => {
   const [activeSessionId, setActiveSessionId] = useState<string>('');
   const [detections, setDetections] = useState<Detection[]>([]);
   const [clips, setClips] = useState<ClipSidecar[]>([]);
+  const [storageTree, setStorageTree] = useState<StorageTreeResponse | null>(null);
+  const [isStorageLoading, setIsStorageLoading] = useState<boolean>(false);
 
   const [minScore, setMinScore] = useState<number>(0);
   const [statusFilter, setStatusFilter] = useState<string>('all');
@@ -93,6 +96,22 @@ export const App: React.FC = () => {
     }
   };
 
+  const loadStorageTree = useCallback(async () => {
+    setIsStorageLoading(true);
+    try {
+      const data = await fetchStorageTree();
+      setStorageTree(data);
+    } catch {
+      // Degraded or offline
+    } finally {
+      setIsStorageLoading(false);
+    }
+  }, []);
+
+  const handleRevealStorage = async (relPath: string) => {
+    return revealStoragePath(relPath);
+  };
+
   const activeClip = clips.find((c) => c.clip_id === activeClipId) || clips[0];
 
   return (
@@ -102,6 +121,7 @@ export const App: React.FC = () => {
         onSelectView={(v) => {
           setActiveView(v);
           if (v === 'clips') fetchClips().then(setClips).catch(() => {});
+          if (v === 'storage') loadStorageTree();
         }}
         health={health}
         clipCount={clips.length}
@@ -144,6 +164,15 @@ export const App: React.FC = () => {
             onExport={(opts) => {
               alert(`Exporting clip (vertical: ${opts.vertical}, captions: ${opts.burnCaptions})`);
             }}
+          />
+        )}
+
+        {activeView === 'storage' && (
+          <StorageBrowser
+            treeData={storageTree}
+            isLoading={isStorageLoading}
+            onRefresh={loadStorageTree}
+            onReveal={handleRevealStorage}
           />
         )}
       </main>
