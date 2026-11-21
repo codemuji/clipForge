@@ -20,6 +20,7 @@ export const ClipDetail: React.FC<ClipDetailProps> = ({
   const [title, setTitle] = useState(clip.review.title || '');
   const [tags, setTags] = useState(clip.review.tags.join(', '));
   const [notes, setNotes] = useState(clip.review.notes || '');
+  const [saveSuccess, setSaveSuccess] = useState(false);
 
   const [startOffset, setStartOffset] = useState(-2.0);
   const [endOffset, setEndOffset] = useState(1.5);
@@ -38,6 +39,8 @@ export const ClipDetail: React.FC<ClipDetailProps> = ({
         tags: tags.split(',').map((t) => t.trim()).filter(Boolean),
         notes
       });
+      setSaveSuccess(true);
+      setTimeout(() => setSaveSuccess(false), 3000);
     }
   };
 
@@ -120,7 +123,14 @@ export const ClipDetail: React.FC<ClipDetailProps> = ({
 
           {/* Review Form Card */}
           <div className="detail-card">
-            <h3 className="card-title">Clip Review (PATCH /clips/:id/review)</h3>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <h3 className="card-title">Clip Review (PATCH /clips/:id/review)</h3>
+              {saveSuccess && (
+                <span className="badge badge-hype" data-testid="review-saved-indicator">
+                  ✓ Review Saved
+                </span>
+              )}
+            </div>
             <form onSubmit={handleSaveReview} style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
               <div className="form-group">
                 <label className="form-label">Review Status</label>
