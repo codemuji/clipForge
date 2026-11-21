@@ -2,11 +2,11 @@
 
 ## Current
 Ticket: B-05
-State: IN PROGRESS
+State: READY
 Branch: lane/b
-PR: none
+PR: #19
 Blocked by: none
-Notes: Implementing B-05 Frame classifier (MobileNetV3-small ONNX, 224x224 input, CUDA EP with CPU fallback, < 30 ms budget, < 1 GB VRAM)
+Notes: B-05 Frame classifier implemented and verified. PR #19 opened. Waiting for Integrator.
 
 ## Done
 - S0-2 Detector model spike — MERGED (PR #6)
