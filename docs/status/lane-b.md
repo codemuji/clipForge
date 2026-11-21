@@ -2,11 +2,11 @@
 
 ## Current
 Ticket: B-03
-State: IN PROGRESS
+State: READY
 Branch: lane/b
-PR: none
+PR: #13
 Blocked by: none
-Notes: Implementing B-03 Speech keywords (whisper.cpp transcription, config/keywords.yaml, keyword matcher)
+Notes: B-03 Speech keywords PR #13 opened, awaiting Integrator review and merge.
 
 ## Done
 - S0-2 Detector model spike — MERGED (PR #6)
