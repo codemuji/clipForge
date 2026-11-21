@@ -2,11 +2,11 @@
 
 ## Current
 Ticket: B-02
-State: IN PROGRESS
+State: READY
 Branch: lane/b
-PR: none
+PR: #11
 Blocked by: none
-Notes: Implementing B-02 Audio signal (loudness, delta, baseline tracking per session)
+Notes: B-02 Audio signal completed, all 16 tests passing, waiting for Integrator review
 
 ## Done
 - S0-2 Detector model spike — MERGED (PR #6)
