@@ -1,12 +1,12 @@
 # Lane A status
 
 ## Current
-Ticket: A-08 Scorer
-State: READY
+Ticket: A-09 Cutter and sidecar
+State: IN PROGRESS
 Branch: lane/a
-PR: #20
+PR: none
 Blocked by: none
-Notes: Implemented HypeScorer with signal fusion, weight renormalization over non-null signals, all-null emission suppression, debounce and cooldown state machines, and SQLite persistence. Verified with 52/52 passing tests.
+Notes: Implementing buffer clip cutter, window clamping [t - pre, t + post], job state transitions (queued -> cutting -> encoded/failed), NVENC with CPU fallback, AGENTS §4 path layout, and sidecar metadata generator.
 
 ## Done
 - A-01 Repo scaffold, Makefile, lint — MERGED (#2)
@@ -18,3 +18,4 @@ Notes: Implemented HypeScorer with signal fusion, weight renormalization over no
 - A-05 Rolling buffer and eviction — MERGED (#15)
 - A-06 Sampler — MERGED (#17)
 - A-07 Chat signal adapter — MERGED (#18)
+- A-08 Scorer — MERGED (#20)
