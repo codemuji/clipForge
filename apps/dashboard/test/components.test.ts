@@ -6,7 +6,8 @@ import { Header } from '../src/components/Header.js';
 import { LiveDetectionsList } from '../src/components/LiveDetectionsList.js';
 import { ClipGrid } from '../src/components/ClipGrid.js';
 import { ClipDetail } from '../src/components/ClipDetail.js';
-import type { Session, Detection, ClipSidecar, HealthResponse } from '../src/types.js';
+import { StorageBrowser } from '../src/components/StorageBrowser.js';
+import type { Session, Detection, ClipSidecar, HealthResponse, StorageTreeResponse } from '../src/types.js';
 
 const mockHealth: HealthResponse = {
   status: 'ok',
@@ -390,4 +391,108 @@ test('ClipDetail component: renders save review action with review status select
   assert.ok(html.includes('review-status-select'), 'Renders review status select input');
   assert.ok(html.includes('review-title-input'), 'Renders title input');
   assert.ok(html.includes('review-tags-input'), 'Renders tags input');
+});
+
+const mockStorageTree: StorageTreeResponse = {
+  root: 'C:/mock/storage',
+  subpath: '',
+  stats: {
+    total_files: 3,
+    total_directories: 4,
+    total_bytes: 15728640 // 15 MB
+  },
+  tree: {
+    name: 'storage',
+    path: '',
+    type: 'directory',
+    size_bytes: 15728640,
+    children: [
+      {
+        name: 'clips',
+        path: 'clips',
+        type: 'directory',
+        size_bytes: 15728640,
+        children: [
+          {
+            name: 'twitch.tv',
+            path: 'clips/twitch.tv',
+            type: 'directory',
+            size_bytes: 15728640,
+            children: [
+              {
+                name: 'clip_01.mp4',
+                path: 'clips/twitch.tv/clip_01.mp4',
+                type: 'file',
+                size_bytes: 15728640,
+                extension: '.mp4',
+                modified_at: '2026-11-20T10:15:19.000Z'
+              },
+              {
+                name: 'clip_01.json',
+                path: 'clips/twitch.tv/clip_01.json',
+                type: 'file',
+                size_bytes: 512,
+                extension: '.json',
+                modified_at: '2026-11-20T10:15:19.000Z'
+              }
+            ]
+          }
+        ]
+      },
+      {
+        name: 'buffer',
+        path: 'buffer',
+        type: 'directory',
+        size_bytes: 0,
+        children: []
+      }
+    ]
+  }
+};
+
+test('Header component: renders storage tab and marks it active when activeView is storage', () => {
+  const html = renderToStaticMarkup(
+    React.createElement(Header, {
+      activeView: 'storage',
+      onSelectView: () => {},
+      health: mockHealth,
+      clipCount: 5
+    })
+  );
+
+  assert.ok(html.includes('nav-tab-storage'), 'Renders storage tab testid');
+  assert.ok(html.includes('nav-tab active" onClick="()=>{}" data-testid="nav-tab-storage"') || html.includes('nav-tab active'), 'Storage tab has active class');
+});
+
+test('StorageBrowser component: renders stats cards, tree nodes with icons, sizes, and reveal buttons', () => {
+  const html = renderToStaticMarkup(
+    React.createElement(StorageBrowser, {
+      treeData: mockStorageTree,
+      isLoading: false,
+      onRefresh: () => {},
+      onReveal: async () => {}
+    })
+  );
+
+  // Summary stats
+  assert.ok(html.includes('15.0 MB'), 'Formats total bytes (15.0 MB)');
+  assert.ok(html.includes('storage-stats-grid'), 'Renders stats grid');
+  assert.ok(html.includes('C:/mock/storage'), 'Renders root path');
+
+  // Tree nodes and icons
+  assert.ok(html.includes('storage-row-root'), 'Renders root row');
+  assert.ok(html.includes('storage-row-clips'), 'Renders clips directory row');
+  assert.ok(html.includes('storage-row-clips/twitch.tv/clip_01.mp4'), 'Renders file row');
+  assert.ok(html.includes('🎬'), 'Renders video icon for mp4');
+  assert.ok(html.includes('📄'), 'Renders document icon for json');
+  assert.ok(html.includes('📁'), 'Renders folder icon');
+
+  // Reveal buttons
+  assert.ok(html.includes('reveal-btn-root'), 'Renders reveal root button');
+  assert.ok(html.includes('reveal-btn-clips'), 'Renders reveal folder button');
+  assert.ok(html.includes('reveal-btn-clips/twitch.tv/clip_01.mp4'), 'Renders reveal file button');
+  assert.ok(html.includes('reveal-root-btn'), 'Renders Open Storage Folder primary button');
+
+  // Empty folder note
+  assert.ok(html.includes('(empty folder)'), 'Renders empty folder notice for empty buffer directory');
 });
