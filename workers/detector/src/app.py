@@ -4,13 +4,16 @@ import os
 import shutil
 import subprocess
 import time
-from typing import Any, Dict
+from typing import Any, Dict, List
 
 from fastapi import FastAPI, HTTPException, status
 from fastapi.responses import JSONResponse
+from pydantic import BaseModel
 
 from .audio import AudioSignalExtractor
 from .cleanup import cleanup_window_files
+from .keywords import SpeechKeywordExtractor
+from .ocr import HudTextExtractor
 from .schemas import (
     AudioSignal,
     DetectorResponse,
@@ -31,6 +34,16 @@ app = FastAPI(
 
 # Signal extractors
 audio_extractor = AudioSignalExtractor()
+keyword_extractor = SpeechKeywordExtractor()
+hud_extractor = HudTextExtractor()
+
+
+class KeywordsUpdate(BaseModel):
+    keywords: List[str]
+
+
+class ProfileUpdate(BaseModel):
+    profile: str
 
 
 def get_gpu_info() -> Dict[str, Any]:
@@ -74,10 +87,56 @@ def health() -> HealthResponse:
     )
 
 
+@app.get("/v1/keywords")
+def get_keywords() -> Dict[str, List[str]]:
+    """Returns active speech keyword list."""
+    return {"keywords": keyword_extractor.keywords}
+
+
+@app.post("/v1/keywords")
+def set_keywords(payload: KeywordsUpdate) -> Dict[str, Any]:
+    """Updates active speech keyword list."""
+    keyword_extractor.set_keywords(payload.keywords)
+    return {"status": "ok", "keywords": keyword_extractor.keywords}
+
+
+@app.get("/v1/hud/profiles")
+def get_hud_profiles() -> Dict[str, Any]:
+    """Returns available game profiles and active profile name."""
+    return {
+        "active_profile": hud_extractor.active_profile_name,
+        "profiles": list(hud_extractor.profiles.keys()),
+    }
+
+
+@app.post("/v1/hud/profile")
+def set_hud_profile(payload: ProfileUpdate) -> Dict[str, Any]:
+    """Switches active game HUD profile."""
+    ok = hud_extractor.set_profile(payload.profile)
+    if not ok:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Unknown profile: {payload.profile}. Available: {list(hud_extractor.profiles.keys())}",
+        )
+    return {"status": "ok", "active_profile": hud_extractor.active_profile_name}
+
+
+@app.get("/v1/hud/patterns")
+def get_hud_patterns() -> Dict[str, Any]:
+    """Returns configured crop regions and patterns for active profile."""
+    prof = hud_extractor.active_profile
+    return {
+        "profile": prof.name,
+        "crop_regions": [{"name": r.name, "box": r.box} for r in prof.crop_regions],
+        "patterns": [{"pattern": p.pattern, "weight": p.weight} for p in prof.patterns],
+    }
+
+
 @app.post("/v1/session/{session_id}/reset")
 def reset_session(session_id: str) -> Dict[str, str]:
     """Resets detector rolling baselines (e.g. audio energy) for a session."""
     audio_extractor.reset_session(session_id)
+    hud_extractor.reset_session(session_id)
     return {"status": "ok", "session_id": session_id, "message": "Baseline reset"}
 
 
@@ -91,19 +150,31 @@ def analyze(req: SamplerRequest) -> DetectorResponse:
     t_start = time.perf_counter()
 
     try:
-        # 1. Audio Signal Extraction (B-02)
+        # 1. Audio Energy Signal Extraction (B-02)
         audio_sig = audio_extractor.extract(
             audio_path=req.audio_path,
             session_id=req.session_id,
             sample_rate=req.audio_sample_rate,
         )
 
-        # 2. Remaining signals (Whisper B-03, HUD B-04, Frame Classifier B-05)
+        # 2. Speech Keywords Signal Extraction (B-03)
+        keyword_sig = keyword_extractor.extract(
+            audio_path=req.audio_path,
+        )
+
+        # 3. HUD On-Screen Text Signal Extraction (B-04)
+        hud_sig = hud_extractor.extract(
+            frame_path=req.frame_path,
+            t_stream=req.t_stream,
+            session_id=req.session_id,
+        )
+
+        # 4. Remaining signals (Frame Classifier B-05)
         # Missing signals return value: None (serialized as null in JSON)
         signals = DetectorSignals(
             audio=audio_sig,
-            speech_keywords=SpeechKeywordsSignal(value=None),
-            hud_text=HudTextSignal(value=None),
+            speech_keywords=keyword_sig,
+            hud_text=hud_sig,
             frame_classifier=FrameClassifierSignal(value=None),
         )
 
