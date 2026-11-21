@@ -2,11 +2,11 @@
 
 ## Current
 Ticket: B-01
-State: IN PROGRESS
+State: READY
 Branch: lane/b
-PR: none
+PR: #9
 Blocked by: none
-Notes: Building B-01 Detector service scaffold (FastAPI, /v1/analyze, /health, schema validation, cleanup)
+Notes: B-01 Detector service scaffold completed, all tests passing, waiting for Integrator review
 
 ## Done
 - S0-2 Detector model spike — MERGED (PR #6)
