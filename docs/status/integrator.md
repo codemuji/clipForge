@@ -26,3 +26,4 @@ Notes: Phase 0 complete! Gate G0 passed. Watching for PRs from Phase 1.
 - C-03 Review actions — MERGED (PR #10, commit dfa76fe)
 - B-02 Audio signal — MERGED (PR #11, commit 14ad9ca)
 - C-06 Storage browser — MERGED (PR #12, commit b627e9a)
+- B-03 Speech keywords — MERGED (PR #13, commit f957c78)
