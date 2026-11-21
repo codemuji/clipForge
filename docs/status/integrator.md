@@ -9,7 +9,7 @@ State: IDLE
 Branch: main
 PR: none
 Blocked by: none
-Notes: Phase 0 complete! Gate G0 passed. Phase 1 underway: A-08 merged (PR #20, commit d5355e7; unblocks A-09 Cutter and sidecar). Watching for next PRs.
+Notes: Phase 0 complete! Gate G0 passed. Phase 1 underway: B-06 merged (PR #21, commit ab3d4c4; Lane B Phase 1 COMPLETE!). A-08 merged (PR #20, commit d5355e7). Waiting on A-09 Cutter to unblock Lane C (C-04/C-05). Watching for next PRs.
 
 ## Done
 - I-00 Repository bootstrap and branch protection — DONE
@@ -34,3 +34,4 @@ Notes: Phase 0 complete! Gate G0 passed. Phase 1 underway: A-08 merged (PR #20, 
 - A-07 Chat signal adapter — MERGED (PR #18, commit 4518929)
 - B-05 Frame classifier — MERGED (PR #19, commit 5974441)
 - A-08 Scorer — MERGED (PR #20, commit d5355e7)
+- B-06 Labelling tool and evaluation — MERGED (PR #21, commit ab3d4c4)

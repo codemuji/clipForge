@@ -1,0 +1,11 @@
+frame_hash,label,source,t_stream
+a1b2c3d4e5f60718,idle,toy_stream_01.mp4,10.0
+b2c3d4e5f6a10719,idle,toy_stream_01.mp4,20.0
+c3d4e5f6a1b20720,lobby,toy_stream_01.mp4,30.0
+d4e5f6a1b2c30721,lobby,toy_stream_01.mp4,40.0
+e5f6a1b2c3d40722,idle,toy_stream_01.mp4,50.0
+f6a1b2c3d4e50723,action,toy_stream_02.mp4,15.0
+12345678abcdef01,action,toy_stream_02.mp4,25.0
+23456789abcdef02,elimination,toy_stream_02.mp4,35.0
+34567890abcdef03,victory,toy_stream_03.mp4,50.0
+45678901abcdef04,victory,toy_stream_03.mp4,60.0
