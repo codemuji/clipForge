@@ -68,8 +68,12 @@ def test_analyze_integration_roundtrip():
         assert "lufs" in data["signals"]["audio"]["detail"]
         assert "lufs_delta" in data["signals"]["audio"]["detail"]
 
-        # Verify remaining signals remain null in B-02
-        for key in ["speech_keywords", "hud_text", "frame_classifier"]:
+        # Verify speech_keywords default (no keywords configured -> 0.0, matched: [])
+        assert data["signals"]["speech_keywords"]["value"] == 0.0
+        assert data["signals"]["speech_keywords"]["detail"]["matched"] == []
+
+        # Verify remaining signals remain null (pending B-04 and B-05)
+        for key in ["hud_text", "frame_classifier"]:
             assert data["signals"][key]["value"] is None
 
         # Verify input files deleted per contract
@@ -77,6 +81,52 @@ def test_analyze_integration_roundtrip():
         assert not Path(wav_path).exists()
 
     finally:
+        for p in [frame_path, wav_path]:
+            if Path(p).exists():
+                Path(p).unlink()
+
+
+def test_analyze_integration_with_keywords():
+    """POST /v1/analyze with configured keywords and speech audio returns non-zero speech score."""
+    speech_fixture = REPO_ROOT / "workers" / "detector" / "tests" / "fixtures" / "clutch_speech.wav"
+    if not speech_fixture.exists():
+        pytest.skip("clutch_speech.wav fixture missing")
+
+    # Configure keywords
+    kw_resp = client.post("/v1/keywords", json={"keywords": ["clutch", "ace"]})
+    assert kw_resp.status_code == 200
+
+    # Copy speech fixture to temp file so analyze can delete it per contract
+    with tempfile.NamedTemporaryFile(suffix=".wav", delete=False) as f_wav:
+        f_wav.write(speech_fixture.read_bytes())
+        wav_path = f_wav.name
+
+    with tempfile.NamedTemporaryFile(suffix=".jpg", delete=False) as f_img:
+        f_img.write(b"dummy image")
+        frame_path = f_img.name
+
+    payload = {
+        "session_id": "sess_integration_kws",
+        "window_id": "win_integration_kws",
+        "t_stream": 10.0,
+        "t_wall": "2026-11-20T12:00:00.000Z",
+        "frame_path": frame_path,
+        "audio_path": wav_path,
+        "audio_sample_rate": 16000,
+        "chat": {"messages_in_window": 5, "unique_chatters": 3},
+    }
+
+    try:
+        response = client.post("/v1/analyze", json=payload)
+        assert response.status_code == 200
+
+        data = response.json()
+        assert data["signals"]["speech_keywords"]["value"] > 0.0
+        assert "clutch" in data["signals"]["speech_keywords"]["detail"]["matched"]
+
+    finally:
+        # Reset keywords back to empty list default
+        client.post("/v1/keywords", json={"keywords": []})
         for p in [frame_path, wav_path]:
             if Path(p).exists():
                 Path(p).unlink()

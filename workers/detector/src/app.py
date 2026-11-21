@@ -4,13 +4,15 @@ import os
 import shutil
 import subprocess
 import time
-from typing import Any, Dict
+from typing import Any, Dict, List
 
 from fastapi import FastAPI, HTTPException, status
 from fastapi.responses import JSONResponse
+from pydantic import BaseModel
 
 from .audio import AudioSignalExtractor
 from .cleanup import cleanup_window_files
+from .keywords import SpeechKeywordExtractor
 from .schemas import (
     AudioSignal,
     DetectorResponse,
@@ -31,6 +33,11 @@ app = FastAPI(
 
 # Signal extractors
 audio_extractor = AudioSignalExtractor()
+keyword_extractor = SpeechKeywordExtractor()
+
+
+class KeywordsUpdate(BaseModel):
+    keywords: List[str]
 
 
 def get_gpu_info() -> Dict[str, Any]:
@@ -74,6 +81,19 @@ def health() -> HealthResponse:
     )
 
 
+@app.get("/v1/keywords")
+def get_keywords() -> Dict[str, List[str]]:
+    """Returns active speech keyword list."""
+    return {"keywords": keyword_extractor.keywords}
+
+
+@app.post("/v1/keywords")
+def set_keywords(payload: KeywordsUpdate) -> Dict[str, Any]:
+    """Updates active speech keyword list."""
+    keyword_extractor.set_keywords(payload.keywords)
+    return {"status": "ok", "keywords": keyword_extractor.keywords}
+
+
 @app.post("/v1/session/{session_id}/reset")
 def reset_session(session_id: str) -> Dict[str, str]:
     """Resets detector rolling baselines (e.g. audio energy) for a session."""
@@ -91,18 +111,23 @@ def analyze(req: SamplerRequest) -> DetectorResponse:
     t_start = time.perf_counter()
 
     try:
-        # 1. Audio Signal Extraction (B-02)
+        # 1. Audio Energy Signal Extraction (B-02)
         audio_sig = audio_extractor.extract(
             audio_path=req.audio_path,
             session_id=req.session_id,
             sample_rate=req.audio_sample_rate,
         )
 
-        # 2. Remaining signals (Whisper B-03, HUD B-04, Frame Classifier B-05)
+        # 2. Speech Keywords Signal Extraction (B-03)
+        keyword_sig = keyword_extractor.extract(
+            audio_path=req.audio_path,
+        )
+
+        # 3. Remaining signals (HUD B-04, Frame Classifier B-05)
         # Missing signals return value: None (serialized as null in JSON)
         signals = DetectorSignals(
             audio=audio_sig,
-            speech_keywords=SpeechKeywordsSignal(value=None),
+            speech_keywords=keyword_sig,
             hud_text=HudTextSignal(value=None),
             frame_classifier=FrameClassifierSignal(value=None),
         )

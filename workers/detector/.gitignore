@@ -5,3 +5,4 @@ spike/models/
 spike/data/
 __pycache__/
 *.pyc
+!tests/fixtures/*.wav
