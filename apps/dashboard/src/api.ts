@@ -1,4 +1,4 @@
-import type { HealthResponse, Session, Detection, ClipSidecar } from './types.js';
+import type { HealthResponse, Session, Detection, ClipSidecar, StorageTreeResponse } from './types.js';
 
 const API_BASE = '/api';
 
@@ -69,5 +69,24 @@ export async function updateClipReview(
     body: JSON.stringify(review)
   });
   if (!res.ok) throw new Error(`Failed to update review for clip ${id}: ${res.statusText}`);
+  return res.json();
+}
+
+export async function fetchStorageTree(subpath: string = ''): Promise<StorageTreeResponse> {
+  const query = subpath ? `?subpath=${encodeURIComponent(subpath)}` : '';
+  const res = await fetch(`${API_BASE}/storage/tree${query}`);
+  if (!res.ok) throw new Error(`Failed to fetch storage tree: ${res.statusText}`);
+  return res.json();
+}
+
+export async function revealStoragePath(relPath: string): Promise<{ success: boolean; command: string; target: string }> {
+  const res = await fetch(`${API_BASE}/storage/reveal`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ path: relPath })
+  });
+  if (!res.ok) throw new Error(`Failed to reveal path ${relPath}: ${res.statusText}`);
   return res.json();
 }
