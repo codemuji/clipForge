@@ -1,12 +1,12 @@
 # Lane C status
 
 ## Current
-Ticket: C-04 Trim
+Ticket: C-05 Export
 State: READY
 Branch: lane/c
-PR: #23
+PR: #25
 Blocked by: none
-Notes: Implemented POST /clips/:id/trim endpoint (recuts from buffer when available or trims from mp4, never overwrites original), sidecar metadata creation for trimmed clip with atomic write-then-rename, and Dashboard UI trim workbench integration (live trimmed duration, progress state, and displaying both original and trimmed clips in the highlight grid). All 19 API tests and 14 Dashboard tests pass, 64 monorepo tests pass.
+Notes: Implemented POST /clips/:id/export endpoint (9:16 vertical crop with NVENC acceleration or CPU fallback, optional captions off by default, preserves original clip), metadata sidecar generation with atomic write, and Dashboard UI export workbench integration. All 22 API tests, 16 Dashboard tests, and monorepo suite pass.
 
 ## Done
 - S0-3 Product and data spike — DONE (PR #1)
@@ -14,3 +14,4 @@ Notes: Implemented POST /clips/:id/trim endpoint (recuts from buffer when availa
 - C-02 Dashboard shell — DONE (PR #7)
 - C-03 Review actions — DONE (PR #10)
 - C-06 Storage browser — DONE (PR #12)
+- C-04 Trim — DONE (PR #23)

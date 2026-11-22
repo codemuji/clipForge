@@ -94,6 +94,27 @@ export async function trimClip(
   return res.json();
 }
 
+export async function exportClip(
+  id: string,
+  options: { vertical?: boolean; burnCaptions?: boolean } = {}
+): Promise<ClipSidecar> {
+  const res = await fetch(`${API_BASE}/clips/${encodeURIComponent(id)}/export`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      vertical: options.vertical,
+      burn_captions: options.burnCaptions
+    })
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err?.error?.message || `Failed to export clip ${id}: ${res.statusText}`);
+  }
+  return res.json();
+}
+
 export async function fetchStorageTree(subpath: string = ''): Promise<StorageTreeResponse> {
   const query = subpath ? `?subpath=${encodeURIComponent(subpath)}` : '';
   const res = await fetch(`${API_BASE}/storage/tree${query}`);

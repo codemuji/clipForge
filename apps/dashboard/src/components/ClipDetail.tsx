@@ -6,7 +6,7 @@ export interface ClipDetailProps {
   onBack: () => void;
   onSaveReview?: (reviewData: { status: string; title: string; tags: string[]; notes: string }) => void;
   onTrim?: (offsets: { startOffset: number; endOffset: number }) => Promise<unknown> | void;
-  onExport?: (options: { vertical: boolean; burnCaptions: boolean }) => void;
+  onExport?: (options: { vertical: boolean; burnCaptions: boolean }) => Promise<unknown> | void;
 }
 
 export const ClipDetail: React.FC<ClipDetailProps> = ({
@@ -29,8 +29,27 @@ export const ClipDetail: React.FC<ClipDetailProps> = ({
 
   const [vertical, setVertical] = useState(clip.media.vertical || false);
   const [burnCaptions, setBurnCaptions] = useState(false);
+  const [isExporting, setIsExporting] = useState(false);
+  const [exportNotice, setExportNotice] = useState<string | null>(null);
 
   const trimmedDuration = Math.max(0, endOffset - startOffset);
+
+  const handleExportClick = async () => {
+    if (onExport) {
+      setIsExporting(true);
+      try {
+        await onExport({ vertical, burnCaptions });
+        setExportNotice('Exported clip created! Original is preserved.');
+        setTimeout(() => setExportNotice(null), 4000);
+      } catch (err: unknown) {
+        const msg = err instanceof Error ? err.message : String(err);
+        setExportNotice(`Error: ${msg}`);
+        setTimeout(() => setExportNotice(null), 4000);
+      } finally {
+        setIsExporting(false);
+      }
+    }
+  };
 
   const handleTrimClick = async () => {
     if (onTrim) {
@@ -263,7 +282,17 @@ export const ClipDetail: React.FC<ClipDetailProps> = ({
 
           {/* Export Workbench Card */}
           <div className="detail-card">
-            <h3 className="card-title">Export (POST /clips/:id/export)</h3>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <h3 className="card-title">Export (POST /clips/:id/export)</h3>
+              {exportNotice && (
+                <span className="badge badge-hype" data-testid="export-notice">
+                  {exportNotice}
+                </span>
+              )}
+            </div>
+            <p style={{ fontSize: '0.8rem', color: '#94a3b8', margin: '0.25rem 0 0.75rem' }}>
+              9:16 export uses NVENC if present, CPU otherwise. Captions optional and off by default. Original is preserved.
+            </p>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
               <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer' }}>
                 <input
@@ -289,10 +318,11 @@ export const ClipDetail: React.FC<ClipDetailProps> = ({
             <button
               className="btn btn-primary"
               style={{ marginTop: '0.75rem' }}
-              onClick={() => onExport && onExport({ vertical, burnCaptions })}
+              onClick={handleExportClick}
+              disabled={isExporting}
               data-testid="export-submit-btn"
             >
-              Export Clip to Disk
+              {isExporting ? 'Exporting...' : 'Export Clip to Disk'}
             </button>
           </div>
         </div>

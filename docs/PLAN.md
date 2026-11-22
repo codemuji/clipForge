@@ -264,9 +264,9 @@ Lanes run in parallel. Within a lane, follow the dependencies.
 - Tests: tree builder on a temp directory.
 
 ### Gate G1 — Execution complete
-- [ ] All Phase 1 tickets merged.
-- [ ] CI green on `main`.
-- [ ] Contracts still v0.1.x, or a version bump recorded in CONTRACTS.md.
+- [x] All Phase 1 tickets merged.
+- [x] CI green on `main`.
+- [x] Contracts still v0.1.x, or a version bump recorded in CONTRACTS.md.
 
 ---
 
