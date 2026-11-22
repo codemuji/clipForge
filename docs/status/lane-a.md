@@ -1,12 +1,12 @@
 # Lane A status
 
 ## Current
-Ticket: A-09 Cutter and sidecar
-State: READY
+Ticket: A-10 Orchestrator and lifecycle
+State: IN PROGRESS
 Branch: lane/a
-PR: #22
+PR: none
 Blocked by: none
-Notes: Implemented buffer clip cutter, window clamping [t - pre, t + post], job state transitions (queued -> cutting -> encoded/failed), NVENC with CPU fallback, AGENTS §4 path layout, and sidecar metadata generator with write-then-rename. 61/61 tests pass.
+Notes: Wiring ingest, buffer manager, sampler, chat adapter, scorer, and clip cutter into end-to-end PipelineOrchestrator daemon with graceful shutdown on SIGINT/Ctrl+C (drain pending clip cuts before exit). Testing full fixture run on loud-burst fixture.
 
 ## Done
 - A-01 Repo scaffold, Makefile, lint — MERGED (#2)
@@ -19,3 +19,4 @@ Notes: Implemented buffer clip cutter, window clamping [t - pre, t + post], job 
 - A-06 Sampler — MERGED (#17)
 - A-07 Chat signal adapter — MERGED (#18)
 - A-08 Scorer — MERGED (#20)
+- A-09 Cutter and sidecar — MERGED (#22)
