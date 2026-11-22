@@ -1,5 +1,7 @@
 import { createLogger, Logger, ClipforgeConfigType } from '@clipforge/shared';
 import { loadOrchestratorConfig, assertSourceAllowed, isSourceAllowed } from './config.js';
+import { PipelineOrchestrator } from './orchestrator/orchestrator.js';
+import type { PipelineOrchestratorOptions } from './orchestrator/types.js';
 
 export const PIPELINE_VERSION = '0.1.0';
 
@@ -10,18 +12,38 @@ export interface OrchestratorInstance {
   config?: ClipforgeConfigType;
   loadConfig: (path?: string) => ClipforgeConfigType;
   verifySource: (url: string) => boolean;
+  pipeline?: PipelineOrchestrator;
+  start: (sourceUrl?: string) => Promise<void>;
+  stop: () => Promise<void>;
 }
 
-export function createOrchestrator(sessionId: string = 'global'): OrchestratorInstance {
-  const logger = createLogger('orchestrator', sessionId);
-  let loadedConfig: ClipforgeConfigType | undefined;
+export function createOrchestrator(
+  sessionId: string = 'global',
+  options?: PipelineOrchestratorOptions
+): OrchestratorInstance {
+  const logger = options?.logger || createLogger('orchestrator', sessionId);
+  let loadedConfig: ClipforgeConfigType | undefined = options?.config;
+
+  let pipelineInstance: PipelineOrchestrator | undefined;
 
   return {
     version: PIPELINE_VERSION,
     logger,
-    status: 'idle',
+    get status() {
+      if (pipelineInstance) {
+        const s = pipelineInstance.getStatus();
+        if (s === 'running' || s === 'starting') return 'running';
+        if (s === 'stopping' || s === 'draining') return 'stopping';
+        if (s === 'error') return 'error';
+        return 'idle';
+      }
+      return 'idle';
+    },
     get config() {
-      return loadedConfig;
+      return loadedConfig || pipelineInstance?.config;
+    },
+    get pipeline() {
+      return pipelineInstance;
     },
     loadConfig(customPath?: string) {
       loadedConfig = loadOrchestratorConfig(customPath);
@@ -33,11 +55,24 @@ export function createOrchestrator(sessionId: string = 'global'): OrchestratorIn
       return loadedConfig;
     },
     verifySource(url: string) {
-      if (!loadedConfig) {
-        throw new Error('Cannot verify source: Orchestrator configuration not loaded');
-      }
-      assertSourceAllowed(loadedConfig, url, logger);
+      const cfg = loadedConfig || this.loadConfig();
+      assertSourceAllowed(cfg, url, logger);
       return true;
+    },
+    async start(sourceUrl?: string) {
+      const cfg = loadedConfig || this.loadConfig();
+      pipelineInstance = new PipelineOrchestrator({
+        ...options,
+        config: cfg,
+        sessionId,
+        logger
+      });
+      await pipelineInstance.start(sourceUrl);
+    },
+    async stop() {
+      if (pipelineInstance) {
+        await pipelineInstance.stop();
+      }
     }
   };
 }
@@ -49,3 +84,4 @@ export * from './sampler/index.js';
 export * from './chat/index.js';
 export * from './scorer/index.js';
 export * from './cutter/index.js';
+export * from './orchestrator/index.js';
