@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import type { ViewMode, Session, Detection, ClipSidecar, HealthResponse, StorageTreeResponse } from './types.js';
-import { fetchHealth, fetchSessions, fetchDetections, fetchClips, dismissDetection, updateClipReview, fetchStorageTree, revealStoragePath, trimClip } from './api.js';
+import { fetchHealth, fetchSessions, fetchDetections, fetchClips, dismissDetection, updateClipReview, fetchStorageTree, revealStoragePath, trimClip, exportClip } from './api.js';
 import { Header } from './components/Header.js';
 import { LiveDetectionsList } from './components/LiveDetectionsList.js';
 import { ClipGrid } from './components/ClipGrid.js';
@@ -120,6 +120,14 @@ export const App: React.FC = () => {
     return newTrimmed;
   };
 
+  const handleExportClip = async (options: { vertical: boolean; burnCaptions: boolean }) => {
+    if (!activeClipId) return;
+    const exportedClip = await exportClip(activeClipId, options);
+    // Prepend exported clip so UI shows both original and exported clips!
+    setClips((prev) => [exportedClip, ...prev]);
+    return exportedClip;
+  };
+
   const activeClip = clips.find((c) => c.clip_id === activeClipId) || clips[0];
 
   return (
@@ -167,9 +175,7 @@ export const App: React.FC = () => {
             onBack={() => setActiveView('clips')}
             onSaveReview={handleSaveReview}
             onTrim={handleTrimClip}
-            onExport={(opts) => {
-              alert(`Exporting clip (vertical: ${opts.vertical}, captions: ${opts.burnCaptions})`);
-            }}
+            onExport={handleExportClip}
           />
         )}
 
