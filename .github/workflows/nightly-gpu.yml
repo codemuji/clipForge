@@ -1,0 +1,41 @@
+name: nightly-gpu
+
+on:
+  schedule:
+    - cron: "30 20 * * *"   # 02:00 IST daily
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  gpu-regression:
+    name: gpu regression
+    runs-on: [self-hosted, gpu]
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check GPU
+        run: nvidia-smi
+
+      - name: Install dependencies
+        run: make setup
+
+      - name: GPU-marked tests
+        run: make test:gpu
+
+      - name: Fixture pipeline on GPU
+        run: make test:fixtures
+        env:
+          CLIPFORGE_GPU: "1"
+
+      - name: Upload results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: nightly-gpu-${{ github.run_id }}
+          path: |
+            docs/perf/
+            storage/logs/
+          if-no-files-found: ignore

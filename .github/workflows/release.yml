@@ -1,0 +1,58 @@
+name: release
+
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+
+jobs:
+  verify:
+    uses: ./.github/workflows/ci.yml
+
+  package:
+    name: package
+    runs-on: ubuntu-latest
+    needs: verify
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+
+      - name: Install dependencies
+        run: make setup
+
+      - name: Production build
+        run: make build
+
+      - name: Package
+        run: |
+          mkdir -p dist
+          tar -czf dist/clipforge-${{ github.ref_name }}.tar.gz \
+            apps/orchestrator/dist apps/api/dist apps/dashboard/dist \
+            workers/detector config README.md docs/CONTRACTS.md
+
+      - name: Generate changelog from merged PRs
+        run: |
+          gh release view "${{ github.ref_name }}" >/dev/null 2>&1 || true
+          git log --merges --pretty='- %s' "$(git describe --tags --abbrev=0 HEAD^ 2>/dev/null || git rev-list --max-parents=0 HEAD)"..HEAD > CHANGELOG-${{ github.ref_name }}.md || true
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            dist/clipforge-${{ github.ref_name }}.tar.gz
+          body_path: CHANGELOG-${{ github.ref_name }}.md
+          generate_release_notes: true
