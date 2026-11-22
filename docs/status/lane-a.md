@@ -2,11 +2,11 @@
 
 ## Current
 Ticket: A-10 Orchestrator and lifecycle
-State: IN PROGRESS
+State: READY
 Branch: lane/a
-PR: none
+PR: #24
 Blocked by: none
-Notes: Wiring ingest, buffer manager, sampler, chat adapter, scorer, and clip cutter into end-to-end PipelineOrchestrator daemon with graceful shutdown on SIGINT/Ctrl+C (drain pending clip cuts before exit). Testing full fixture run on loud-burst fixture.
+Notes: Implemented PipelineOrchestrator daemon integrating ingest, rolling buffer, stream sampler, chat adapter, hype scorer, and clip cutter. Added graceful shutdown (SIGINT / Ctrl+C) draining pending clip jobs before exit. Verified with make lint, make test (65/65 unit tests), make test:fixtures (full loud-burst fixture run), and make dev end-to-end fixture execution.
 
 ## Done
 - A-01 Repo scaffold, Makefile, lint — MERGED (#2)
