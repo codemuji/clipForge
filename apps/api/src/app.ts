@@ -3,6 +3,7 @@ import { DatabaseService } from './db.js';
 import { checkHealth } from './health.js';
 import { buildStorageTree, revealInExplorer } from './storage.js';
 import { trimClip, type TrimOptions } from './trim.js';
+import { exportClip, type ExportRequest } from './export.js';
 
 export interface AppOptions {
   db?: DatabaseService;
@@ -211,6 +212,52 @@ export function createApp(options: AppOptions = {}): FastifyInstance {
       const isNotFound = message.includes('Clip not found');
       const statusCode = isNotFound ? 404 : 400;
       const errorCode = isNotFound ? 'CLIP_NOT_FOUND' : 'INVALID_TRIM_REQUEST';
+
+      return reply.status(statusCode).send({
+        error: {
+          code: errorCode,
+          message,
+          correlation_id: correlationId
+        }
+      });
+    }
+  });
+
+  // POST /api/clips/:id/export - exports clip (9:16 vertical crop, captions) per CONTRACTS §7
+  app.post<{
+    Params: {
+      id: string;
+    };
+    Body: {
+      vertical?: boolean;
+      burn_captions?: boolean;
+    };
+  }>('/api/clips/:id/export', async (request, reply) => {
+    const { id } = request.params;
+    const body = request.body || {};
+    const correlationId = (request.headers['x-correlation-id'] as string) || request.id || id;
+
+    try {
+      const exportResult = await exportClip(
+        id,
+        {
+          vertical: body.vertical,
+          burn_captions: body.burn_captions
+        },
+        db,
+        {
+          storagePath,
+          ffmpegExecutor: options.ffmpegExecutor,
+          ffprobeExecutor: options.ffprobeExecutor
+        }
+      );
+
+      return reply.status(201).send(exportResult.clip);
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : String(err);
+      const isNotFound = message.includes('Clip not found');
+      const statusCode = isNotFound ? 404 : 400;
+      const errorCode = isNotFound ? 'CLIP_NOT_FOUND' : 'EXPORT_FAILED';
 
       return reply.status(statusCode).send({
         error: {

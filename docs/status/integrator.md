@@ -9,7 +9,7 @@ State: IDLE
 Branch: main
 PR: none
 Blocked by: none
-Notes: Phase 0 complete! Gate G0 passed. Phase 1 underway: A-10 merged (PR #24, commit caf38ec). Lane A and Lane B Phase 1 COMPLETE! Watching for Lane C (C-05 Export) to reach Gate G1.
+Notes: Phase 0 and Phase 1 complete! Gate G0 and Gate G1 passed. All 17 Phase 1 tickets across Lanes A, B, and C are merged to main. All CI checks green on main (run 45024813929). Entering Phase 2 (Debugging).
 
 ## Done
 - I-00 Repository bootstrap and branch protection — DONE
@@ -38,3 +38,5 @@ Notes: Phase 0 complete! Gate G0 passed. Phase 1 underway: A-10 merged (PR #24, 
 - A-09 Cutter and sidecar — MERGED (PR #22, commit b75b650)
 - C-04 Trim — MERGED (PR #23, commit 883defe)
 - A-10 Orchestrator and lifecycle — MERGED (PR #24, commit caf38ec)
+- C-05 Export — MERGED (PR #25, commit 81abfc3)
+- Gate G1 Execution complete — PASSED (2026-11-22)

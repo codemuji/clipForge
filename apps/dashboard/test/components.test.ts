@@ -545,3 +545,54 @@ test('ClipGrid component: renders both original and trimmed clips in highlight g
   assert.ok(html.includes('Original Clip (Trimmed)'), 'Renders trimmed title');
   assert.ok(html.includes('8.0s'), 'Renders trimmed duration badge');
 });
+
+test('ClipDetail component: renders export workbench with 9:16 vertical option, burn captions option, and submit action', () => {
+  const html = renderToStaticMarkup(
+    React.createElement(ClipDetail, {
+      clip: mockClips[0],
+      onBack: () => {},
+      onExport: () => {}
+    })
+  );
+
+  assert.ok(html.includes('Export (POST /clips/:id/export)'), 'Renders export card title');
+  assert.ok(html.includes('export-vertical-checkbox'), 'Renders vertical checkbox');
+  assert.ok(html.includes('export-captions-checkbox'), 'Renders captions checkbox');
+  assert.ok(html.includes('export-submit-btn'), 'Renders export submit button');
+  assert.ok(html.includes('Export Clip to Disk'), 'Renders export button label');
+  assert.ok(html.includes('9:16 export uses NVENC if present, CPU otherwise'), 'Mentions hardware acceleration');
+});
+
+test('ClipGrid component: renders exported 9:16 clip alongside original clip', () => {
+  const exportedClip: ClipSidecar = {
+    ...mockClips[0],
+    clip_id: `${mockClips[0].clip_id}_export_916`,
+    media: {
+      ...mockClips[0].media,
+      file: 'storage/clips/twitch.tv/streamer_a/2026-11-20/clip_01_export.mp4',
+      vertical: true
+    },
+    review: {
+      ...mockClips[0].review,
+      title: 'Clutch 1v3 Quadra (9:16 Export)',
+      tags: ['highlight', 'clutch', 'vertical', '9:16']
+    }
+  };
+
+  const html = renderToStaticMarkup(
+    React.createElement(ClipGrid, {
+      clips: [mockClips[0], exportedClip],
+      statusFilter: 'all',
+      onChangeStatusFilter: () => {},
+      sourceFilter: 'all',
+      onChangeSourceFilter: () => {},
+      onSelectClip: () => {}
+    })
+  );
+
+  assert.ok(html.includes('clip-card-clip_01'), 'Renders original clip card');
+  assert.ok(html.includes(`clip-card-${exportedClip.clip_id}`), 'Renders exported clip card');
+  assert.ok(html.includes('Clutch 1v3 Quadra (9:16 Export)'), 'Renders exported title');
+  assert.ok(html.includes('9:16'), 'Renders 9:16 tag');
+});
+
