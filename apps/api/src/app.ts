@@ -2,6 +2,7 @@ import Fastify, { type FastifyInstance, type FastifyError } from 'fastify';
 import { DatabaseService } from './db.js';
 import { checkHealth } from './health.js';
 import { buildStorageTree, revealInExplorer } from './storage.js';
+import { trimClip, type TrimOptions } from './trim.js';
 
 export interface AppOptions {
   db?: DatabaseService;
@@ -11,6 +12,8 @@ export interface AppOptions {
   logger?: boolean;
   revealPlatform?: NodeJS.Platform;
   revealExecutor?: (command: string, args: string[]) => void;
+  ffmpegExecutor?: (cmd: string, args: string[]) => Promise<void>;
+  ffprobeExecutor?: (filePath: string) => Promise<{ duration: number; width: number; height: number; codec: string }>;
 }
 
 export function createApp(options: AppOptions = {}): FastifyInstance {
@@ -160,6 +163,63 @@ export function createApp(options: AppOptions = {}): FastifyInstance {
     }
 
     return updated;
+  });
+
+  // POST /api/clips/:id/trim - trims clip from buffer or original mp4 per CONTRACTS §7
+  app.post<{
+    Params: {
+      id: string;
+    };
+    Body: {
+      start_offset_s: number;
+      end_offset_s: number;
+    };
+  }>('/api/clips/:id/trim', async (request, reply) => {
+    const { id } = request.params;
+    const body = request.body || ({} as Record<string, unknown>);
+
+    const correlationId = (request.headers['x-correlation-id'] as string) || request.id || id;
+
+    if (body.start_offset_s === undefined || body.end_offset_s === undefined) {
+      return reply.status(400).send({
+        error: {
+          code: 'INVALID_TRIM_REQUEST',
+          message: 'Both start_offset_s and end_offset_s are required',
+          correlation_id: correlationId
+        }
+      });
+    }
+
+    try {
+      const trimResult = await trimClip(
+        id,
+        {
+          start_offset_s: Number(body.start_offset_s),
+          end_offset_s: Number(body.end_offset_s)
+        },
+        db,
+        {
+          storagePath,
+          ffmpegExecutor: options.ffmpegExecutor,
+          ffprobeExecutor: options.ffprobeExecutor
+        }
+      );
+
+      return reply.status(201).send(trimResult.clip);
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : String(err);
+      const isNotFound = message.includes('Clip not found');
+      const statusCode = isNotFound ? 404 : 400;
+      const errorCode = isNotFound ? 'CLIP_NOT_FOUND' : 'INVALID_TRIM_REQUEST';
+
+      return reply.status(statusCode).send({
+        error: {
+          code: errorCode,
+          message,
+          correlation_id: correlationId
+        }
+      });
+    }
   });
 
   // GET /api/storage/tree - returns file and folder tree of storage

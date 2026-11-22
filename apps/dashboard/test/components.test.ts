@@ -352,7 +352,7 @@ test('ClipDetail component: renders video player, metadata, signals, review form
   assert.ok(html.includes('storage/clips/twitch.tv/streamer_a/2026-11-20/clip_01.mp4'), 'Renders disk file path');
   assert.ok(html.includes('Clip Review (PATCH /clips/:id/review)'), 'Renders review form');
   assert.ok(html.includes('Trim Clip (POST /clips/:id/trim)'), 'Renders trim workbench');
-  assert.ok(html.includes('Recut Clip from Buffer'), 'Renders trim button');
+  assert.ok(html.includes('trim-submit-btn'), 'Renders trim button');
   assert.ok(html.includes('Export (POST /clips/:id/export)'), 'Renders export workbench');
   assert.ok(html.includes('Vertical Crop (9:16 Center-Weighted)'), 'Renders vertical crop toggle');
   assert.ok(html.includes('Burn Captions (Whisper Subtitles)'), 'Renders captions toggle');
@@ -495,4 +495,53 @@ test('StorageBrowser component: renders stats cards, tree nodes with icons, size
 
   // Empty folder note
   assert.ok(html.includes('(empty folder)'), 'Renders empty folder notice for empty buffer directory');
+});
+
+test('ClipDetail component: renders trim workbench with inputs and submit action', () => {
+  const html = renderToStaticMarkup(
+    React.createElement(ClipDetail, {
+      clip: mockClips[0],
+      onBack: () => {},
+      onTrim: () => {}
+    })
+  );
+
+  assert.ok(html.includes('Trim Clip (POST /clips/:id/trim)'), 'Renders trim card title');
+  assert.ok(html.includes('trim-start-input'), 'Renders trim start input');
+  assert.ok(html.includes('trim-end-input'), 'Renders trim end input');
+  assert.ok(html.includes('trimmed-duration-display'), 'Renders trimmed duration display');
+  assert.ok(html.includes('Trim &amp; Save New Clip') || html.includes('Trim & Save New Clip'), 'Renders trim submit button');
+  assert.ok(html.includes('Original is never overwritten'), 'Mentions original protection');
+});
+
+test('ClipGrid component: renders both original and trimmed clips in highlight grid', () => {
+  const trimmedClip: ClipSidecar = {
+    ...mockClips[0],
+    clip_id: `${mockClips[0].clip_id}_trim_123`,
+    media: {
+      ...mockClips[0].media,
+      file: 'storage/clips/twitch.tv/streamer_a/2026-11-20/clip_01_trim.mp4',
+      duration_s: 8.0
+    },
+    review: {
+      ...mockClips[0].review,
+      title: 'Original Clip (Trimmed)'
+    }
+  };
+
+  const html = renderToStaticMarkup(
+    React.createElement(ClipGrid, {
+      clips: [mockClips[0], trimmedClip],
+      statusFilter: 'all',
+      onChangeStatusFilter: () => {},
+      sourceFilter: 'all',
+      onChangeSourceFilter: () => {},
+      onSelectClip: () => {}
+    })
+  );
+
+  assert.ok(html.includes('clip-card-clip_01'), 'Renders original clip card');
+  assert.ok(html.includes(`clip-card-${trimmedClip.clip_id}`), 'Renders trimmed clip card');
+  assert.ok(html.includes('Original Clip (Trimmed)'), 'Renders trimmed title');
+  assert.ok(html.includes('8.0s'), 'Renders trimmed duration badge');
 });
