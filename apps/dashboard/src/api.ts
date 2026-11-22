@@ -72,6 +72,28 @@ export async function updateClipReview(
   return res.json();
 }
 
+export async function trimClip(
+  id: string,
+  startOffsetS: number,
+  endOffsetS: number
+): Promise<ClipSidecar> {
+  const res = await fetch(`${API_BASE}/clips/${encodeURIComponent(id)}/trim`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      start_offset_s: startOffsetS,
+      end_offset_s: endOffsetS
+    })
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err?.error?.message || `Failed to trim clip ${id}: ${res.statusText}`);
+  }
+  return res.json();
+}
+
 export async function fetchStorageTree(subpath: string = ''): Promise<StorageTreeResponse> {
   const query = subpath ? `?subpath=${encodeURIComponent(subpath)}` : '';
   const res = await fetch(`${API_BASE}/storage/tree${query}`);

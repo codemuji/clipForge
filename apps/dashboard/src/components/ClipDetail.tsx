@@ -5,7 +5,7 @@ export interface ClipDetailProps {
   clip: ClipSidecar;
   onBack: () => void;
   onSaveReview?: (reviewData: { status: string; title: string; tags: string[]; notes: string }) => void;
-  onTrim?: (offsets: { startOffset: number; endOffset: number }) => void;
+  onTrim?: (offsets: { startOffset: number; endOffset: number }) => Promise<unknown> | void;
   onExport?: (options: { vertical: boolean; burnCaptions: boolean }) => void;
 }
 
@@ -22,13 +22,32 @@ export const ClipDetail: React.FC<ClipDetailProps> = ({
   const [notes, setNotes] = useState(clip.review.notes || '');
   const [saveSuccess, setSaveSuccess] = useState(false);
 
-  const [startOffset, setStartOffset] = useState(-2.0);
-  const [endOffset, setEndOffset] = useState(1.5);
+  const [startOffset, setStartOffset] = useState(0.0);
+  const [endOffset, setEndOffset] = useState(Math.max(1, clip.media.duration_s));
+  const [isTrimming, setIsTrimming] = useState(false);
+  const [trimNotice, setTrimNotice] = useState<string | null>(null);
 
   const [vertical, setVertical] = useState(clip.media.vertical || false);
   const [burnCaptions, setBurnCaptions] = useState(false);
 
-  const trimmedDuration = Math.max(1, clip.media.duration_s + (-startOffset) + endOffset);
+  const trimmedDuration = Math.max(0, endOffset - startOffset);
+
+  const handleTrimClick = async () => {
+    if (onTrim) {
+      setIsTrimming(true);
+      try {
+        await onTrim({ startOffset, endOffset });
+        setTrimNotice('Trimmed clip created! Original is preserved.');
+        setTimeout(() => setTrimNotice(null), 4000);
+      } catch (err: unknown) {
+        const msg = err instanceof Error ? err.message : String(err);
+        setTrimNotice(`Error: ${msg}`);
+        setTimeout(() => setTrimNotice(null), 4000);
+      } finally {
+        setIsTrimming(false);
+      }
+    }
+  };
 
   const handleSaveReview = (e: React.FormEvent) => {
     e.preventDefault();
@@ -191,7 +210,17 @@ export const ClipDetail: React.FC<ClipDetailProps> = ({
 
           {/* Trim Workbench Card */}
           <div className="detail-card">
-            <h3 className="card-title">Trim Clip (POST /clips/:id/trim)</h3>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <h3 className="card-title">Trim Clip (POST /clips/:id/trim)</h3>
+              {trimNotice && (
+                <span className="badge badge-hype" data-testid="trim-notice">
+                  {trimNotice}
+                </span>
+              )}
+            </div>
+            <p style={{ fontSize: '0.8rem', color: '#94a3b8', margin: '0.25rem 0 0.75rem' }}>
+              Recuts from high-quality buffer if available, or trims original MP4. Original is never overwritten.
+            </p>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }}>
               <div className="form-group">
                 <label className="form-label">Start Offset (s)</label>
@@ -219,15 +248,16 @@ export const ClipDetail: React.FC<ClipDetailProps> = ({
 
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '0.5rem' }}>
               <span className="overview-label">Trimmed Duration</span>
-              <span className="overview-value">{trimmedDuration.toFixed(1)}s</span>
+              <span className="overview-value" data-testid="trimmed-duration-display">{trimmedDuration.toFixed(1)}s</span>
             </div>
 
             <button
               className="btn btn-secondary"
-              onClick={() => onTrim && onTrim({ startOffset, endOffset })}
+              onClick={handleTrimClick}
+              disabled={isTrimming}
               data-testid="trim-submit-btn"
             >
-              Recut Clip from Buffer
+              {isTrimming ? 'Trimming...' : 'Trim & Save New Clip'}
             </button>
           </div>
 
