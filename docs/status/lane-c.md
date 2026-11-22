@@ -2,11 +2,11 @@
 
 ## Current
 Ticket: C-05 Export
-State: IN PROGRESS
+State: READY
 Branch: lane/c
-PR: none
+PR: #25
 Blocked by: none
-Notes: Implementing POST /clips/:id/export endpoint (9:16 vertical crop with NVENC acceleration or CPU fallback, optional burn captions, writes new file beside original), metadata sidecar generation, and Dashboard UI export workbench integration.
+Notes: Implemented POST /clips/:id/export endpoint (9:16 vertical crop with NVENC acceleration or CPU fallback, optional captions off by default, preserves original clip), metadata sidecar generation with atomic write, and Dashboard UI export workbench integration. All 22 API tests, 16 Dashboard tests, and monorepo suite pass.
 
 ## Done
 - S0-3 Product and data spike — DONE (PR #1)
