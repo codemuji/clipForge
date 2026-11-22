@@ -2,11 +2,11 @@
 
 ## Current
 Ticket: C-04 Trim
-State: IN PROGRESS
+State: READY
 Branch: lane/c
-PR: none
+PR: #23
 Blocked by: none
-Notes: Implementing POST /clips/:id/trim endpoint (recuts from buffer when available or trims from mp4, never overwriting original), sidecar metadata creation for trimmed clip, and Dashboard UI trim workbench integration.
+Notes: Implemented POST /clips/:id/trim endpoint (recuts from buffer when available or trims from mp4, never overwrites original), sidecar metadata creation for trimmed clip with atomic write-then-rename, and Dashboard UI trim workbench integration (live trimmed duration, progress state, and displaying both original and trimmed clips in the highlight grid). All 19 API tests and 14 Dashboard tests pass, 64 monorepo tests pass.
 
 ## Done
 - S0-3 Product and data spike — DONE (PR #1)
