@@ -2,14 +2,11 @@
 
 ## Current
 Ticket: C-04 Trim
-State: BLOCKED
+State: IN PROGRESS
 Branch: lane/c
 PR: none
-Blocked by: A-09 (Cutter and sidecar not yet merged to main)
-Notes: C-01, C-02, C-03, and C-06 are all completed and merged to main. C-04 depends on A-09 per docs/PLAN.md. Waiting on Lane A to implement and merge A-09. All currently unblocked tickets in Lane C are completed.
-
-## Cross-lane requests
-- Lane A (A-09): Cutter service and buffer segment cutting functions needed for C-04 (Trim from buffer and mp4).
+Blocked by: none
+Notes: Implementing POST /clips/:id/trim endpoint (recuts from buffer when available or trims from mp4, never overwriting original), sidecar metadata creation for trimmed clip, and Dashboard UI trim workbench integration.
 
 ## Done
 - S0-3 Product and data spike — DONE (PR #1)
