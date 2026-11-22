@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import type { ViewMode, Session, Detection, ClipSidecar, HealthResponse, StorageTreeResponse } from './types.js';
-import { fetchHealth, fetchSessions, fetchDetections, fetchClips, dismissDetection, updateClipReview, fetchStorageTree, revealStoragePath } from './api.js';
+import { fetchHealth, fetchSessions, fetchDetections, fetchClips, dismissDetection, updateClipReview, fetchStorageTree, revealStoragePath, trimClip } from './api.js';
 import { Header } from './components/Header.js';
 import { LiveDetectionsList } from './components/LiveDetectionsList.js';
 import { ClipGrid } from './components/ClipGrid.js';
@@ -112,6 +112,14 @@ export const App: React.FC = () => {
     return revealStoragePath(relPath);
   };
 
+  const handleTrimClip = async (offsets: { startOffset: number; endOffset: number }) => {
+    if (!activeClipId) return;
+    const newTrimmed = await trimClip(activeClipId, offsets.startOffset, offsets.endOffset);
+    // Prepend new trimmed clip so UI shows both original and trimmed clips per C-04 acceptance!
+    setClips((prev) => [newTrimmed, ...prev]);
+    return newTrimmed;
+  };
+
   const activeClip = clips.find((c) => c.clip_id === activeClipId) || clips[0];
 
   return (
@@ -158,9 +166,7 @@ export const App: React.FC = () => {
             clip={activeClip}
             onBack={() => setActiveView('clips')}
             onSaveReview={handleSaveReview}
-            onTrim={(offsets) => {
-              alert(`Recutting clip with start: ${offsets.startOffset}s, end: ${offsets.endOffset}s`);
-            }}
+            onTrim={handleTrimClip}
             onExport={(opts) => {
               alert(`Exporting clip (vertical: ${opts.vertical}, captions: ${opts.burnCaptions})`);
             }}
